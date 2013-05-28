@@ -20,6 +20,31 @@
   ADJUST Number of feeds to download each run to match feed number on your system
 
   640 feeds per run x 24 runs a day = 15360 feeds synced a day
+
+  For this script to run, you need to first copy the users and feeds table from the master server to the backup server using the more common backup procedure of using mysqldump and scp:
+
+  1) MysqlDump users and feeds tables from master server
+  mysqldump -u root -p --single-transaction emoncms feeds > feeds.sql
+  mysqldump -u root -p --single-transaction emoncms users > users.sql
+
+  2) Log into backup machine
+  ssh username@ipaddress
+
+  3) Enter mysql terminal
+  mysql -u username -p -A emoncms
+
+  4) Drop existing users and feeds tables:
+  DROP TABLE feeds;
+  DROP TABLE users;
+  exit;
+
+  5) Copy over feeds and users table export from master server
+  scp username@ipaddress:users.sql /home/username
+  scp username@ipaddress:feeds.sql /home/username
+
+  6) Import users and feeds table into backup mysql database
+  mysql -u username -p emoncms < users.sql
+  mysql -u username -p emoncms < feeds.sql
   
 */
 
