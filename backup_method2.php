@@ -21,54 +21,61 @@
   while ($row = $result->fetch_array())
   {
     $n++;
+
     $feedid = $row['id'];
+
+    $verbose = true;
+
     $starttime = 0;
     $backupsize = 0;
 
-    $backupfeedname = "/backup/feeds/feed_$feedid.MYD";
+    $backupfeedname = "/home/username/backup/feeds/feed_$feedid.MYD";
     $primaryfeedname = "/var/lib/mysql/emoncms/feed_$feedid.MYD";
 
     $primarysize = filesize($primaryfeedname);
     $backupsize = 0;
 
-    $transfer_rate = 0;
-    echo $n." ";
-    // 1) Does backup MYD exist?
-    if (file_exists($backupfeedname)) {
-      $backupsize = filesize($backupfeedname);
-      echo "E ";       // E for exists
-    } else echo "- ";  // - does not exist
-
-    if ($primarysize>$backupsize)
+    if ($primarysize<(1024*1024*100)) // 100 MiB
     {
-      $dnsize = $primarysize-$backupsize;
-      $dnstart = microtime(true);
-      echo "DN ";
-      $primary = fopen($primaryfeedname, 'rb');
-      $backup = fopen($backupfeedname, 'a');
+      $trate = 0;
+      echo $n." ";
+      // 1) Does backup MYD exist?
+      if (file_exists($backupfeedname)) {
+        $backupsize = filesize($backupfeedname);
+        if ($verbose) echo "E ";
+      } else echo "- ";
 
-      fseek($primary,$backupsize);
-
-      // manually set transfer rate
-      // 9*32 = number of bytes read each time
-      // usleep(1500); delay microseconds between each read
-      for ($i=$backupsize; $i<$primarysize; $i+=(9*32))
+      if ($primarysize>$backupsize)
       {
-        fwrite($backup,fread($primary,(9*32)));
-        usleep(1500);
-      }
-      
-      fclose($backup);
-      fclose($primary);
+        $dnsize = $primarysize-$backupsize;
+        $dnstart = microtime(true);
+        echo "DN ";
+        $primary = fopen($primaryfeedname, 'rb');
+        $backup = fopen($backupfeedname, 'a');
+        fseek($primary,$backupsize);
 
-      $transfer_rate = ($dnsize / (microtime(true) - $dnstart))/1000.0;
+        $left_to_read = $dnsize;
+        do
+        {
+          if ($left_to_read>147456) $readsize = 147456; else $readsize = $left_to_read;
+          $left_to_read -= $readsize;
 
-    } else { echo "-- "; } 
+          $data = fread($primary,$readsize);
+          fwrite($backup,$data);
+          if ($dnsize>147456) sleep(2);
 
-    echo "feed $feedid:".$row['name'];
-    if ($transfer_rate>0) echo " ".number_format($transfer_rate,0)." kB/s";
-    echo "\n";
- 
-  }
+          echo $left_to_read."\n";
+        }
+        while ($left_to_read>0);
+        
+        fclose($backup);
+        fclose($primary);
 
+        $trate = ($dnsize / (microtime(true) - $dnstart))/1000.0;
+      } else { echo "-- "; } 
 
+      echo "feed ".$row['id'].":".$row['name'];
+      if ($trate>0) echo " ".number_format($trate,0)." kB/s ($dnsize)";
+      echo "\n";
+    }
+ }
