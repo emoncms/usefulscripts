@@ -23,6 +23,7 @@ cd /var/www/emoncms
 git pull
 
 # Create new settings.php file and copy settings over
+cd /home/pi/usefulscripts/
 sh set_emoncms_settings.sh
 
 echo "---------------------------------------------------"
