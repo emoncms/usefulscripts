@@ -32,7 +32,7 @@ echo "---------------------------------------------------"
 # Update raspberrypi module
 
 if [ -d "/var/www/emoncms/Modules/raspberrypi" ]; then
-  "Updating raspberrypi module"
+  echo "Updating raspberrypi module"
   cd /var/www/emoncms/Modules/raspberrypi
   git pull
   
@@ -55,7 +55,7 @@ echo "---------------------------------------------------"
 # Update event module
 
 if [ -d "/var/www/emoncms/Modules/event" ]; then
-  "Updating event module"
+  echo "Updating event module"
   cd /var/www/emoncms/Modules/event
   git pull
 else
@@ -69,7 +69,7 @@ echo "---------------------------------------------------"
 # Download converttotimestore
 
 if [ -d "/var/www/emoncms/Modules/converttotimestore" ]; then
-  "Updating converttotimestore module"
+  echo "Updating converttotimestore module"
   cd /var/www/emoncms/Modules/converttotimestore
   git pull
 else
