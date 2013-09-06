@@ -1,5 +1,4 @@
 
-
 echo "---------------------------------------------------"
 echo "Installing timestore"
 echo "---------------------------------------------------"
@@ -15,7 +14,6 @@ echo "---------------------------------------------------"
 echo "Installing php5-curl"
 echo "---------------------------------------------------"
 # Install php curl
-sudo apt-get update
 sudo apt-get install php5-curl
 
 # Update emoncms
