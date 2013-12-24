@@ -1,12 +1,26 @@
 <?php
 
+  define('EMONCMS_EXEC', 1);
+  
+  chdir("/var/www/emoncms");
+  // 1) Load settings and core scripts
+  require "process_settings.php";
+  
+  $mysqli = @new mysqli($server,$username,$password,$database);
+
+  $redis = new Redis(); 
+  $redis->connect("127.0.0.1");  
+    
+  include "Modules/feed/feed_model.php";
+  $feedclass = new Feed($mysqli,$redis,$timestore_adminkey);
+  
   // local userid
   $userid = 1;
-  $mysqli = @new mysqli("localhost","root","password","emoncms");
 
   // 1) Fetch remote server feeds
-  $server = "http://192.168.1.79/emoncms";
-  $apikey = "remote apikey";
+  $server = "http://192.168.1.69/emoncms";
+  $apikey = "enter your apikey here";
+  
   $feeds = file_get_contents($server."/feed/list.json?apikey=$apikey");
   $feeds = json_decode($feeds);
   
@@ -14,9 +28,7 @@
   foreach ($feeds as $feed)
   {
     if ($feed->datatype==1 && $feed->engine==1) import_timestore($mysqli,$userid,$server,$apikey,$feed);
-    
     if ($feed->engine==0) import_mysql($mysqli,$userid,$server,$apikey,$feed);
-    
     //echo " Downloading: ".$feed->id." ".$feed->name."\n"; 
   }
   
@@ -34,6 +46,8 @@
       // Create feed
       echo "create feed ".$feed->id."\n";
       $result = $mysqli->query("INSERT INTO feeds (id,userid,name,tag,datatype,public,engine) VALUES ('".$feed->id."','$userid','".$feed->name."','".$feed->tag."','".$feed->datatype."','false','1')");
+      
+      $feedclass->load_feed_to_redis($feed->id);
     }
     else
     {
@@ -95,12 +109,23 @@
         
         echo "--layer: $layer ";
         $feedname = "/var/lib/timestore/".str_pad($feed->id, 16, '0', STR_PAD_LEFT)."_".$layer."_.dat";
-        $backup = fopen($feedname, 'a');
+
         
         $downloadfrom = filesize($feedname);
         $url = $server."/feed/export.json?apikey=$apikey&id=".$feed->id."&layer=$layer&start=$downloadfrom";
         $primary = @fopen( $url, 'r' );
 
+        if ($downloadfrom>=4) {
+          // update last datapoint
+          $firstdp = fread($primary,4);
+          
+          $backup = fopen($feedname, 'c');
+            fseek($backup,$downloadfrom-4);
+            fwrite($backup,$firstdp);
+          fclose($backup);
+        }
+        
+        $backup = fopen($feedname, 'a');
         
         $dnsize = 0;
         if ($primary)
@@ -194,6 +219,23 @@
 
     if ($fh)
     {
+      // The first line is to be updated
+      if ($start!=0)
+      {
+        $data = fgetcsv($fh, 0, ",");
+        if (isset($data[0]) && isset($data[1]) && count($data)!=3)
+        {
+          $feedtime = $data[0]; $value = $data[1];
+          $mysqli->query("UPDATE $feedname SET `data` = '$value' WHERE `time` = '$feedtime'");
+        }
+        
+        if (isset($data[0]) && isset($data[1]) && count($data)==3)
+        {
+          $feedtime = $data[0]; $value = $data[1]; $value2 = $data[2];
+          $mysqli->query("UPDATE $feedname SET `data` = '$value', `data2`='$value2' WHERE `time` = '$feedtime'");
+        }
+      }
+    
       // Read through the file
       $i = 0; $vals = "";
       while (($data = fgetcsv($fh, 0, ",")) !== FALSE) 
