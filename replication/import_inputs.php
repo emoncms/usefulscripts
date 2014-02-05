@@ -13,7 +13,7 @@
   {
     echo json_encode($input)."\n";
     $mysqli->query("DELETE FROM input WHERE `id` = '".$input->id."'");
-    $mysqli->query("INSERT INTO input (`id`,`userid`,`name`,`processList`,`time`,`value`,`nodeid`,`description`,`record`) VALUES ('".$input->id."','".$userid."','".$input->name."','".$input->processList."','".$input->time."','".$input->value."','".$input->nodeid."','".$input->description."','".$input->record."')");
+    $mysqli->query("INSERT INTO input (`id`,`userid`,`name`,`processList`,`time`,`value`,`nodeid`,`description`) VALUES ('".$input->id."','".$userid."','".$input->name."','".$input->processList."','".$input->time."','".$input->value."','".$input->nodeid."','".$input->description."')");
 
   }
   
