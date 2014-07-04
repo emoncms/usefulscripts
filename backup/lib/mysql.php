@@ -3,8 +3,10 @@
   //--------------------------------------------------------------------------------------------------
   // IMPORT MYSQL
   //--------------------------------------------------------------------------------------------------
-  function import_mysql($mysqli,$userid,$server,$apikey,$feed)
+  function import_mysql($feed,$server,$apikey,$mysqli)
   {
+    echo "MYSQL: ".$feed->id."\n";
+    
     $feedname = "feed_".trim($feed->id)."";
 
     $result = $mysqli->query("SELECT id FROM feeds WHERE `id` = '".$feed->id."'");
@@ -32,8 +34,6 @@
     }
     else
     {
-      echo "feed meta exists ".$feed->id."\n";
-
       $feedid = $feed->id;
       $result = $mysqli->query("SHOW TABLES LIKE 'feed_$feedid'");
 
@@ -69,7 +69,7 @@
     // Open the file served from the export page on the remote server
     $url = $server.'/feed/export.json?apikey='.$apikey.'&id='.$feed->id.'&start='.$start;
 
-    echo "Opening file $url\n";
+    // echo "Opening file $url\n";
     $fh = @fopen( $url, 'r' );
 
     $histogram = false;
@@ -93,6 +93,7 @@
         }
       }
     
+      $lines = 0;
       // Read through the file
       $i = 0; $vals = "";
       while (($data = fgetcsv($fh, 0, ",")) !== FALSE) 
@@ -124,6 +125,7 @@
               if ($vals && !$histogram) $mysqli->query("INSERT INTO $feedname (`time`,`data`) VALUES ".$vals);
               if ($vals && $histogram) $mysqli->query("INSERT INTO $feedname (`time`,`data`,`data2`) VALUES ".$vals);
               $vals = "";
+              $lines++;
             }
           }
         }
@@ -135,5 +137,7 @@
       $vals = "";
       fclose($fh);
     }
+    
+    echo "--lines: ".$lines."\n";
   }
   

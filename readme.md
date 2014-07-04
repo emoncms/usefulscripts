@@ -2,13 +2,19 @@
 
 Useful scripts for managing your emoncms installation.
 
-## Replication/Backup
+## Backup/Replication
 
-For emoncms version 8 replication use replication/import_v8
+This is a tool for backing up the data in an emoncms.org account or other remote emoncms server to a local computer. It can be used with or without a local installation of emoncms. To use, open Backup/backup.php in a text editor. 
 
-    php import_v8.php
-    
-This tool needs to be tested again with the latest version of emoncms v8.2.7
+- Set $remote_server and $remote_apikey to correspond to the remote emoncms account you wish to download from.
+- Set $link\_to\_local\_emoncms to true if you wish to access your data within a local installation of emoncms. Set $local\_emoncms\_location and $local\_emoncms\_userid to link to your local emoncms installation.
+- Set $link\_to\_local\_emoncms to false if you just want to download the data without linking to a local emoncms install (non-mysql data only). Set $dir to the directory on your computer you wish to download the data. Manually create the folders: phpfina, phpfiwa, phptimeseries, phptimestore within this folder.
+
+- Run the backup script from terminal with:
+
+    php backup.php
+
+Tested with emoncms.org (v8.0.9: 4 July 2014), and local emoncms v8.2.8
 
 ## Data recovery
 
@@ -20,6 +26,6 @@ To use the data recovery tool, open recover.php and set both source and target d
     
 ## Integrity check
 
-A tool for checking the integrity of your emoncms phpfiwa, phpfina, phptimeseries and phptimestore feeds. Run the integrity check tool from terminal with:
+A tool for checking the integrity of your emoncms phpfiwa, phpfina, phptimeseries and phptimestore feeds. To use, open recover.php and set the engine data directories. Run the recover tool from terminal with:
 
     php integritycheck.php
