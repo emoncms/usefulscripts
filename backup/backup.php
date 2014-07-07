@@ -87,7 +87,7 @@
         }
         
         if ($feed->engine==1 && $feed->datatype==1) {
-            import_phptimestore($id,$server,$remote_apikey,$engines['phptimestore']['datadir']);
+            import_phptimestore($feed->id,$server,$remote_apikey,$engines['phptimestore']['datadir']);
         }
 
         if ($feed->engine==2) {
