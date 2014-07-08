@@ -22,6 +22,7 @@
     include "lib/phpfina.php";
         
     $remote_server = "http://emoncms.org";
+    // NEEDS TO BE YOUR WRITE APIKEY (ELEVATED PERMISSIONS FOR FULL DATA EXPORT)
     $remote_apikey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
     
     $link_to_local_emoncms = false;

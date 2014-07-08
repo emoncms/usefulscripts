@@ -42,7 +42,7 @@ function import_phpfiwa($id,$server,$apikey,$datadir)
         $local_meta = $remote_meta;
         
         if (!$metafile = @fopen($datadir.$id.".meta", 'wb')) {
-            echo "Cannot open local npoints meta data file\n";
+            echo "Cannot open local meta data file: Does the phpfiwa folder exist?\n";
             return false;
         }
         fwrite($metafile,pack("I",$remote_meta->id));

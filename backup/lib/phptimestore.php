@@ -5,7 +5,15 @@
     echo "PHPTIMESTORE: $id\n";
     // Get the timestore meta deta for the remote feed: start time, interval and number of rows
     $result = file_get_contents($server."/feed/getmeta.json?apikey=$apikey&id=$id");
+    
+    if ($result=="false")
+    {
+        echo "Error in fetching remote meta data, Incorrect apikey\n";
+        return false;
+    }
+    
     $remote_meta = json_decode($result);
+    
     if (!isset($remote_meta->start) || !isset($remote_meta->interval))
     {
         echo "Error in fetching remote meta data, received: $result\n";
