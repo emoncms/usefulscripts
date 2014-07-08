@@ -4,7 +4,13 @@
   {     
     echo "PHPTIMESTORE: $id\n";
     // Get the timestore meta deta for the remote feed: start time, interval and number of rows
-    $remote_meta = json_decode(file_get_contents($server."/feed/getmeta.json?apikey=$apikey&id=$id"));
+    $result = file_get_contents($server."/feed/getmeta.json?apikey=$apikey&id=$id");
+    $remote_meta = json_decode($result);
+    if (!isset($remote_meta->start) || !isset($remote_meta->interval))
+    {
+        echo "Error in fetching remote meta data, received: $result\n";
+        return false;
+    }
         
     // Check if there is a local timestore feed (REPEAT OF ABOVE)
     $feedname = $datadir.str_pad($id, 16, '0', STR_PAD_LEFT).".tsdb";
