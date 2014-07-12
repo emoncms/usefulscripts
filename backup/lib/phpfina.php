@@ -34,7 +34,7 @@ function import_phpfina($id,$server,$apikey,$datadir)
             return false;
         }
         
-        fwrite($metafile,pack("I",$local_meta->id));
+        fwrite($metafile,pack("I",$id));
         // Legacy npoints, npoints moved to seperate file
         fwrite($metafile,pack("I",0)); 
         fwrite($metafile,pack("I",$local_meta->interval));
