@@ -20,7 +20,8 @@
     include "lib/phptimestore.php";
     include "lib/phpfiwa.php";
     include "lib/phpfina.php";
-        
+    include "lib/inputs.php";
+      
     $remote_server = "http://emoncms.org";
     // NEEDS TO BE YOUR WRITE APIKEY (ELEVATED PERMISSIONS FOR FULL DATA EXPORT)
     $remote_apikey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
@@ -28,6 +29,7 @@
     $link_to_local_emoncms = false;
     $local_emoncms_location = "/var/www/emoncms/";
     $local_emoncms_userid = 1;
+    $backup_inputs = false;
     
     // $dir and $engines only need to be set if your not linking to a local emoncms installation
     // if you are linking to a local emoncms installation, the settings will be fetched from
@@ -61,6 +63,8 @@
         $redis->connect("127.0.0.1");
         
         $engines = $feed_settings;
+        
+        if ($backup_inputs) backup_inputs($mysqli,$remote_server,$remote_apikey,$local_emoncms_userid);
     } else {
         $mysqli = false;
         $redis = false;

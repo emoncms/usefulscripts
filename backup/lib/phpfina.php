@@ -98,6 +98,7 @@ function import_phpfina($id,$server,$apikey,$datadir)
 
         echo "--downloaded: ".$dnsize." bytes\n";
         
+        clearstatcache($datadir.$id.".dat");
         $local_meta->npoints = intval(filesize($datadir.$id.".dat") / 4.0);
         
         if (!$metafile = @fopen($datadir."$id.npoints", 'wb')) {
