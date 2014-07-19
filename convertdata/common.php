@@ -18,11 +18,8 @@
         $targetfile = $properties['targetfile'];
         $bytelength = $properties['bytelength'];
         
-        $fhr = @fopen($sourcefile, 'rb');
-        if (!$fhr) return false;
-        
-        $fhw = @fopen($targetfile, 'wb');
-        if (!$fhw) return false;
+        $fhr = fopen($sourcefile, 'rb');
+        $fhw = fopen($targetfile, 'wb');
 
         $size = filesize($sourcefile);
         $onepercent = (int) $size / 100;

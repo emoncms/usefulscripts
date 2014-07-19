@@ -46,7 +46,7 @@
                       'bytelength'=>4
                     ));
                     
-                    clearstatcache();
+                    clearstatcache($target.$name."_".$l."_.dat");
                     $npoints[] = filesize($target.$name."_".$l."_.dat") / 4.0;
                 }
             }
@@ -57,12 +57,10 @@
 
             fseek($metafile,8);
             $d = fread($metafile,8);
-            $tmp = unpack("h*",$d);
-            $meta->feedid = (int) strrev($tmp[1]);
+            $tmp = unpack("h*",$d); // no longer used
             $tmp = unpack("I",fread($metafile,4));
             $meta->nmetrics = $tmp[1];
-            $tmp = unpack("I",fread($metafile,4));
-            $legacy_npoints = $tmp[1];
+            $tmp = unpack("I",fread($metafile,4)); // no longer used
             $tmp = unpack("I",fread($metafile,8));
             $meta->start = $tmp[1];
             $tmp = unpack("I",fread($metafile,4));
@@ -72,17 +70,12 @@
             $metafile = fopen($target.$feedname, 'wb');
             fwrite($metafile,pack("I",0));
             fwrite($metafile,pack("I",0));
-            fwrite($metafile,pack("h*",strrev(str_pad($id, 16, '0', STR_PAD_LEFT))));
+            fwrite($metafile,pack("h*",strrev(str_pad(0, 16, '0', STR_PAD_LEFT))));
             fwrite($metafile,pack("I",$meta->nmetrics));
             fwrite($metafile,pack("I",0));                  // Legacy
             fwrite($metafile,pack("I",$meta->start));
             fwrite($metafile,pack("I",0));
             fwrite($metafile,pack("I",$meta->interval));
-            fclose($metafile);
-            
-            $feedname = str_pad($id, 16, '0', STR_PAD_LEFT).".npoints";
-            $metafile = fopen($target.$feedname, 'wb');
-            fwrite($metafile,pack("I",$npoints[0]));
             fclose($metafile);
         }
         return $feeds;        

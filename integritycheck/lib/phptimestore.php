@@ -47,22 +47,14 @@
             fseek($metafile,8);
             $d = fread($metafile,8);
             $tmp = unpack("h*",$d);
-            $meta->feedid = (int) strrev($tmp[1]);
             $tmp = unpack("I",fread($metafile,4));
             $meta->nmetrics = $tmp[1];
             $tmp = unpack("I",fread($metafile,4));
-            $legacy_npoints = $tmp[1];
             $tmp = unpack("I",fread($metafile,8));
             $meta->start = $tmp[1];
             $tmp = unpack("I",fread($metafile,4));
             $meta->interval = $tmp[1];
             fclose($metafile);
-            
-            if ($meta->feedid != $id)
-            {
-                $errormsg .= "[meta data mismatch, meta feedid: ".$meta->feedid."]";
-                $error = true;
-            }
             
             if ($meta->nmetrics!=1) {
                 $errormsg .= "[nmetrics is not 1]";
@@ -74,30 +66,12 @@
                 $errormsg .= "[interval is out of range = ".$meta->interval."]";
                 $error = true;
             }
-            
-            $feedname = str_pad($id, 16, '0', STR_PAD_LEFT).".npoints";
-            if (!file_exists($dir.$feedname)){
-                $errormsg .= "[npoints meta file does not exist]";
-                $error = true;
-                $fsize = filesize($dir.str_pad($id, 16, '0', STR_PAD_LEFT)."_0_.dat") / 4;
-                if ($legacy_npoints!=$fsize) {
-                    $errormsg .= "[legacy npoints:".$legacy_npoints." != fsize:$fsize]";
-                    $error = true; 
-                }
-            } else {
-                $metafile = fopen($dir.$feedname, 'rb');
-                $tmp = unpack("I",fread($metafile,4)); 
-                $npoints = $tmp[1];
-                fclose($metafile);
-                $meta->npoints = $npoints;
-                
-                $fsize = filesize($dir.str_pad($id, 16, '0', STR_PAD_LEFT)."_0_.dat") / 4;
-                if ($meta->npoints!=$fsize) {
-                    $errormsg .= "[npoints:".$meta->npoints." != fsize:$fsize]";
-                    $error = true; 
-                }
+             
+            $npoints = filesize($dir.str_pad($id, 16, '0', STR_PAD_LEFT)."_0_.dat") / 4;
+            if (intval($npoints)!=$npoints) {
+                $errormsg .= "[npoints:".intval($npoints)." != npoints:$npoints]";
+                $error = true; 
             }
-
 
             $feedname = str_pad($id, 16, '0', STR_PAD_LEFT).".tsdb";
             if ($error) print "Feed $id ".$errormsg." [".date("d:m:Y G:i",filemtime($dir.$feedname))."]\n";

@@ -38,48 +38,34 @@
             
             // CHECK 1: META FILE EXISTS
             if (!file_exists($dir.$feedname)) {
-                print "[Meta file does not exist: $userid $id]\n";
+                print "[Meta file does not exist: $id]\n";
                 $error = true;
             } 
             else 
             {
                 $meta = new stdClass();
                 $metafile = fopen($dir.$feedname, 'rb');
-                $tmp = unpack("I",fread($metafile,4)); 
-                $meta->id = $tmp[1];
-                // Legacy npoints
-                $tmp = unpack("I",fread($metafile,4));
-                $legacy_npoints = $tmp[1];
+                fseek($metafile,8);
                 $tmp = unpack("I",fread($metafile,4)); 
                 $meta->interval = $tmp[1];
                 $tmp = unpack("I",fread($metafile,4)); 
                 $meta->start_time = $tmp[1];
                 fclose($metafile);
-                
-                $metafile = fopen($dir."$id.npoints", 'rb');
-                $tmp = unpack("I",fread($metafile,4));
-                $npoints = $tmp[1];
-                fclose($metafile);
-                $meta->npoints = $npoints;
-                
-                $fsize = filesize($dir.$id.".dat") / 4;
-                
-                if ($meta->id != $id) {
-                    $errormsg .= "[non matching feedid ".$meta->id."]";
-                    $error = true;            
-                }
+               
+                clearstatcache($dir.$id.".dat");
+                $npoints = filesize($dir.$id.".dat") / 4;
                 
                 if ($meta->interval < 5){
                     $errormsg .= "[interval: ".$meta->interval."]";
                     $error = true; 
                 }
                 
-                if ($meta->npoints != $fsize){
-                    $errormsg .= "[npoints:".$meta->npoints." != fsize:$fsize]";
+                if (intval($npoints) != $npoints){
+                    $errormsg .= "[integer npoints:".intval($npoints)." != npoints:$npoints]";
                     $error = true; 
                 }
                 
-                if ($meta->start_time==0 && $meta->npoints>0) {
+                if ($meta->start_time==0 && $npoints>0) {
                     $errormsg .= "[start==0]";
                     $error = true;
                 }

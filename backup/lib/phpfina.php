@@ -11,21 +11,21 @@ function import_phpfina($id,$server,$apikey,$datadir)
     if (file_exists($datadir.$id.".meta"))
     {
         $local_meta = new stdClass();
+        
         if (!$metafile = @fopen($datadir.$id.".meta", 'rb')) {
             echo "Cannot open local metadata file\n";
             return false;
         }
         
-        $tmp = unpack("I",fread($metafile,4)); 
-        $local_meta->id = $tmp[1];
-        // Legacy npoints
-        $tmp = unpack("I",fread($metafile,4));
-        $legacy_npoints = $tmp[1];
+        fseek($metafile,8);
+        
         $tmp = unpack("I",fread($metafile,4)); 
         $local_meta->interval = $tmp[1];
         $tmp = unpack("I",fread($metafile,4)); 
         $local_meta->start_time = $tmp[1];
+        
         fclose($metafile);
+        
     } else {
         $local_meta = $remote_meta;
 
@@ -34,8 +34,8 @@ function import_phpfina($id,$server,$apikey,$datadir)
             return false;
         }
         
-        fwrite($metafile,pack("I",$id));
-        // Legacy npoints, npoints moved to seperate file
+        // First 8 bytes used to hold id and npoints but are now removed.
+        fwrite($metafile,pack("I",0));
         fwrite($metafile,pack("I",0)); 
         fwrite($metafile,pack("I",$local_meta->interval));
         fwrite($metafile,pack("I",$local_meta->start_time)); 
@@ -50,7 +50,7 @@ function import_phpfina($id,$server,$apikey,$datadir)
         if (file_exists($datadir.$id.".dat")) {
             $downloadfrom = filesize($datadir.$id.".dat");
             if (intval($downloadfrom/4.0)!=($downloadfrom/4.0)) { 
-                echo "PHPFiwa feed ".$feed->id." corrupt\n"; 
+                echo "PHPFiwa feed ".$id." corrupt\n"; 
                 die; 
             }
         } else { 
@@ -97,17 +97,6 @@ function import_phpfina($id,$server,$apikey,$datadir)
         fclose($primary);
 
         echo "--downloaded: ".$dnsize." bytes\n";
-        
-        clearstatcache($datadir.$id.".dat");
-        $local_meta->npoints = intval(filesize($datadir.$id.".dat") / 4.0);
-        
-        if (!$metafile = @fopen($datadir."$id.npoints", 'wb')) {
-            echo "Cannot open local npoints meta data file\n";
-            return false;
-        }
-        
-        fwrite($metafile,pack("I",$local_meta->npoints));
-        fclose($metafile);
     }
     else
     {

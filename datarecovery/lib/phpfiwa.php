@@ -44,35 +44,28 @@
                       'bytelength'=>4
                     ));
                     
-                    clearstatcache();
+                    clearstatcache($target.$id."_".$l.".dat");
                     $npoints[] = filesize($target.$id."_".$l.".dat") / 4.0;
                 }
             }
             
-            $metafile = fopen($target."$id.npoints", 'wb');
             foreach ($npoints as $np) {
                 if ((int)$np!=$np) {
                     print "filesize error\n";
-                } else {   
-                    fwrite($metafile,pack("I",$np));
                 }
             }
-            fclose($metafile);
             
             $meta = new stdClass();
             $metafile = fopen($source.$id.".meta", 'rb');
-            $tmp = unpack("I",fread($metafile,4)); 
-            $meta->id = $tmp[1];
+            fseek($metafile,4);
             $tmp = unpack("I",fread($metafile,4)); 
             $meta->start_time = $tmp[1];
             $tmp = unpack("I",fread($metafile,4)); 
             $meta->nlayers = $tmp[1]; 
             
-            $meta->npoints = array();
             for ($i=0; $i<$meta->nlayers; $i++)
             {
-              $tmp = unpack("I",fread($metafile,4)); 
-              $meta->npoints[$i] = $tmp[1];
+              $tmp = unpack("I",fread($metafile,4));
             }
             
             $meta->interval = array();
@@ -84,15 +77,14 @@
             
             fclose($metafile);
             
-            if ($meta->id != $id) print "Feed id's dont match!\n";
             if ($meta->start_time==0) print "Feed start time error!\n";
             if ($meta->interval[0]<5) print "Feed interval error!".$meta->interval[0]."\n";
             
             $metafile = fopen($target.$id.".meta", 'wb');    
-            fwrite($metafile,pack("I",$meta->id));
+            fwrite($metafile,pack("I",0));
             fwrite($metafile,pack("I",$meta->start_time)); 
             fwrite($metafile,pack("I",$meta->nlayers));
-            foreach ($meta->npoints as $n) fwrite($metafile,pack("I",0));       // Legacy
+            foreach ($meta->interval as $n) fwrite($metafile,pack("I",0));       // Legacy
             foreach ($meta->interval as $d) fwrite($metafile,pack("I",$d));
             fclose($metafile);
             

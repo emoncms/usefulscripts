@@ -22,14 +22,14 @@
     include "lib/phpfina.php";
     include "lib/inputs.php";
       
-    $remote_server = "http://emoncms.org";
+    $remote_server = "http://192.168.1.65/emoncms";
     // NEEDS TO BE YOUR WRITE APIKEY (ELEVATED PERMISSIONS FOR FULL DATA EXPORT)
-    $remote_apikey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    $remote_apikey = "539799625b00534a367d9e239a3e04d5";
     
-    $link_to_local_emoncms = false;
+    $link_to_local_emoncms = true;
     $local_emoncms_location = "/var/www/emoncms/";
     $local_emoncms_userid = 1;
-    $backup_inputs = false;
+    $backup_inputs = true;
     
     // $dir and $engines only need to be set if your not linking to a local emoncms installation
     // if you are linking to a local emoncms installation, the settings will be fetched from

@@ -29,3 +29,12 @@ To use the data recovery tool, open recover.php and set both source and target d
 A tool for checking the integrity of your emoncms phpfiwa, phpfina, phptimeseries and phptimestore feeds. To use, open recover.php and set the engine data directories. Run the recover tool from terminal with:
 
     php integritycheck.php
+    
+## Covert data
+
+There are two scripts for converting phpfiwa or phptimestore to phpfina. PHPFina has a much lower write load when used as the storage engine on SD Cards. Using these conversion scripts you can convert your data to PHPFina so that it can be used with the new SD Card branch of emoncms called 'bufferedwrite'
+
+    phpfiwa_to_phpfina.php
+    phptimestore_to_phpfina.php
+    
+Set the source and target directory as well as emoncms install location and then run as above.

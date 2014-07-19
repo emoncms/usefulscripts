@@ -15,20 +15,15 @@ function import_phpfiwa($id,$server,$apikey,$datadir)
             echo "Cannot open local meta data file\n";
             return false;
         }
-
-        $tmp = unpack("I",fread($metafile,4)); 
-        $local_meta->id = $tmp[1];
+        
+        fseek($metafile,4);
+        
         $tmp = unpack("I",fread($metafile,4)); 
         $local_meta->start_time = $tmp[1];
         $tmp = unpack("I",fread($metafile,4)); 
         $local_meta->nlayers = $tmp[1];
        
-        $local_meta->npoints = array();
-        for ($i=0; $i<$local_meta->nlayers; $i++)
-        {
-          $tmp = unpack("I",fread($metafile,4)); 
-          $local_meta->npoints[$i] = $tmp[1];  // Legacy
-        }
+        fseek($metafile,4 * $local_meta->nlayers);
         
         $local_meta->interval = array();
         for ($i=0; $i<$local_meta->nlayers; $i++)
@@ -45,7 +40,7 @@ function import_phpfiwa($id,$server,$apikey,$datadir)
             echo "Cannot open local meta data file: Does the phpfiwa folder exist?\n";
             return false;
         }
-        fwrite($metafile,pack("I",$remote_meta->id));
+        fwrite($metafile,pack("I",0));
         fwrite($metafile,pack("I",$remote_meta->start_time)); 
         fwrite($metafile,pack("I",$remote_meta->nlayers));
         foreach ($remote_meta->npoints as $n) fwrite($metafile,pack("I",0)); // Legacy
@@ -65,7 +60,7 @@ function import_phpfiwa($id,$server,$apikey,$datadir)
             if (file_exists($datadir.$id."_".$layer.".dat")) {
                 $downloadfrom = filesize($datadir.$id."_".$layer.".dat");
                 if (intval($downloadfrom/4.0)!=($downloadfrom/4.0)) { 
-                    echo "PHPFiwa feed ".$feed->id." corrupt\n"; 
+                    echo "PHPFiwa feed ".$id." corrupt\n"; 
                     die; 
                 }
             } else { 
@@ -112,16 +107,7 @@ function import_phpfiwa($id,$server,$apikey,$datadir)
             fclose($primary);
         
             echo $dnsize." bytes\n";
-            
-            $local_meta->npoints[$layer] = intval(filesize($datadir.$id."_".$layer.".dat") / 4.0);
         }
-        
-        if (!$metafile = @fopen($datadir."$id.npoints", 'wb')) {
-            echo "Cannot open local npoints meta data file\n";
-            return false;
-        }
-        foreach ($local_meta->npoints as $n) fwrite($metafile,pack("I",$n));
-        fclose($metafile);
     }
     else
     {

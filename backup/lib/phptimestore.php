@@ -32,12 +32,10 @@
         }
         fseek($metafile,8);
         $d = fread($metafile,8);
-        $tmp = unpack("h*",$d);
-        $local_meta->id = (int) strrev($tmp[1]);
+        $tmp = unpack("h*",$d); // id no longer used
         $tmp = unpack("I",fread($metafile,4));
         $local_meta->nmetrics = $tmp[1];
-        $tmp = unpack("I",fread($metafile,4));
-        $legacy_npoints = $tmp[1];
+        $tmp = unpack("I",fread($metafile,4)); // npoints no longer used
         $tmp = unpack("I",fread($metafile,8));
         $local_meta->start = $tmp[1];
         $tmp = unpack("I",fread($metafile,4));
@@ -54,7 +52,7 @@
         }
         fwrite($metafile,pack("I",0));
         fwrite($metafile,pack("I",0));
-        fwrite($metafile,pack("h*",strrev(str_pad($id, 16, '0', STR_PAD_LEFT))));
+        fwrite($metafile,pack("h*",strrev(str_pad(0, 16, '0', STR_PAD_LEFT))));
         fwrite($metafile,pack("I",$local_meta->nmetrics));
         fwrite($metafile,pack("I",0));                  // Legacy
         fwrite($metafile,pack("I",$local_meta->start));
@@ -128,15 +126,6 @@
                 
         echo $dnsize." bytes\n";
       }
-      
-      $feedname = $datadir.str_pad($id, 16, '0', STR_PAD_LEFT)."_0_.dat";
-      $local_meta->npoints = floor(filesize($feedname) / 4.0);
-      if (!$metafile = @fopen($datadir.str_pad($id, 16, '0', STR_PAD_LEFT).".npoints", 'wb')) {
-          echo "Cannot open local meta data file\n";
-          return false;
-      }
-      fwrite($metafile,pack("I",$local_meta->npoints));
-      fclose($metafile);
     }
     else
     {
