@@ -26,10 +26,10 @@
     // NEEDS TO BE YOUR WRITE APIKEY (ELEVATED PERMISSIONS FOR FULL DATA EXPORT)
     $remote_apikey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
     
-    $link_to_local_emoncms = true;
+    $link_to_local_emoncms = false;
     $local_emoncms_location = "/var/www/emoncms/";
     $local_emoncms_userid = 1;
-    $backup_inputs = true;
+    $backup_inputs = false;
     
     // $dir and $engines only need to be set if your not linking to a local emoncms installation
     // if you are linking to a local emoncms installation, the settings will be fetched from
