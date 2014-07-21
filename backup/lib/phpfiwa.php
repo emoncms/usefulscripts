@@ -29,7 +29,12 @@ function import_phpfiwa($id,$server,$apikey,$datadir)
         $tmp = unpack("I",fread($metafile,4)); 
         $local_meta->nlayers = $tmp[1];
        
-        fseek($metafile,4 * $local_meta->nlayers);
+        $local_meta->npoints = array();
+        for ($i=0; $i<$local_meta->nlayers; $i++)
+        {
+          $tmp = unpack("I",fread($metafile,4)); 
+          $local_meta->npoints[$i] = $tmp[1];
+        }
         
         $local_meta->interval = array();
         for ($i=0; $i<$local_meta->nlayers; $i++)
