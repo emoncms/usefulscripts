@@ -8,7 +8,7 @@ function import_phptimeseries($feedid,$server,$apikey,$datadir)
         $downloadfrom = filesize($feedname);
 
         if (intval($downloadfrom/9.0)!=($downloadfrom/9.0)) { 
-            echo "PHPTimeSeries feed $feedid corrupt\n"; 
+            echo "PHPTimeSeries: local datafile filesize is not an integer number of 9 bytes\n"; 
             return false;
         }
         
