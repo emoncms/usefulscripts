@@ -7,6 +7,12 @@ function import_phpfina($id,$server,$apikey,$datadir)
     // Download phpfiwa feed meta data
     $remote_meta = json_decode(file_get_contents($server."/feed/getmeta.json?apikey=$apikey&id=".$id));
     
+    if ($remote_meta==false || !isset($remote_meta->start_time) || !isset($remote_meta->interval)) {
+        echo "ERROR: Invalid remote meta, returned false\n";
+        echo json_encode($remote_meta)."\n";
+        return false;
+    }
+    
     // Load local meta data file
     if (file_exists($datadir.$id.".meta"))
     {
@@ -50,7 +56,7 @@ function import_phpfina($id,$server,$apikey,$datadir)
         if (file_exists($datadir.$id.".dat")) {
             $downloadfrom = filesize($datadir.$id.".dat");
             if (intval($downloadfrom/4.0)!=($downloadfrom/4.0)) { 
-                echo "PHPFiwa feed ".$id." corrupt\n"; 
+                echo "ERROR: local datafile filesize is not an integer number of 4 bytes\n";  
                 die; 
             }
         } else { 
@@ -68,7 +74,7 @@ function import_phpfina($id,$server,$apikey,$datadir)
             // update last datapoint
             $firstdp = fread($primary,4);
             if (!$backup = @fopen($datadir.$id.".dat", 'c')) {
-                echo "Cannot open local data file\n";
+                echo "Cannot open local data file - to update last datapoint\n";
                 return false;
             }
             fseek($backup,$downloadfrom-4);
@@ -77,7 +83,7 @@ function import_phpfina($id,$server,$apikey,$datadir)
         }
 
         if (!$backup = @fopen($datadir.$id.".dat", 'a')) {
-            echo "Cannot open local data file\n";
+            echo "Cannot open local data file - to append data\n";
             return false;
         }
 
@@ -100,6 +106,9 @@ function import_phpfina($id,$server,$apikey,$datadir)
     }
     else
     {
-      echo "local and remote meta data do not match\n";
+      echo "ERROR: Local and remote meta data do not match\n";
+      echo "-- local->start = ".$local_meta->start_time." remote->start = ".$remote_meta->start_time."\n";
+      echo "-- local->interval = ".$local_meta->interval." remote->interval = ".$remote_meta->interval."\n";
+      
     }
 }
