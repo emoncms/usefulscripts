@@ -38,3 +38,17 @@ There are two scripts for converting phpfiwa or phptimestore to phpfina. PHPFina
     phptimestore_to_phpfina.php
     
 Set the source and target directory as well as emoncms install location and then run as above.
+
+## Remove spikes
+
+This script is useful to remove irregularities in feed data, and works through the phpfiwa data files searching for values that are larger or smaller than the limits, when it find one it sets it to NAN which means its ignored in the graph.
+
+To run the script;
+
+    sudo php remove_spike.php -i FeedId -n MinValue -x MaxValue
+    
+for example to remove value above 5.5V and below 1V (battery feed in V for example) on feed 22 the syntax is;
+
+    sudo php remove_spike.php -i 22 -n 1 -x 5.5
+
+ONLY WORKS WITH PHPFIWA DATA!
