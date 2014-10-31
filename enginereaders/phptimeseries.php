@@ -1,10 +1,10 @@
 <?php
 
     // Directory of phptimeseries feeds, see: settings.php
-    $dir = "/home/trystan/Data/19July/phptimeseries/";
+    $dir = "/var/lib/phptimeseries/";
     
     // Feed id to read: 
-    $feedid = 46406;
+    $feedid = 1;
     
     //----------------------------------------------------
     
