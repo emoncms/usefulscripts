@@ -12,7 +12,7 @@
     // TO:
         
         // Feed id to write to: 
-        $feedid = 2; 
+        $target_feedid = 2; 
         
         // Using the PHPFina class here to save writting the post function directly
         // it will be quite a bit slower than a version written to keep the feed open
@@ -73,5 +73,5 @@
         
         // Save $kwh to feed
         // print $time." "+$kwh."\n";
-        $phpfina->post($feedid,$time,$kwh);
+        $phpfina->post($target_feedid,$time,$kwh);
     }
