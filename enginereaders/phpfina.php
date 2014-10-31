@@ -1,7 +1,7 @@
 <?php
 
     // Directory of phpfina feeds, see: settings.php
-    $dir = "/home/trystan/Data/19July/phpfina/";
+    $dir = "/hvar/lib/phpfina/";
     
     // Feed id to read: 
     $feedid = 1;
