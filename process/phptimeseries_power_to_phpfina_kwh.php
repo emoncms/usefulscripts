@@ -1,5 +1,9 @@
 <?php
 
+    
+    define('EMONCMS_EXEC', 1);
+    chdir("/var/www/emoncms");
+    require "Modules/log/EmonLogger.php";
     //----------------------------------------------------
     
     // CONVERT: 
@@ -17,7 +21,7 @@
         // Using the PHPFina class here to save writting the post function directly
         // it will be quite a bit slower than a version written to keep the feed open
         // while making the conversion - which would be an approach worth looking at.
-        require "/var/www/emoncms/Modules/feed/engine/PHPFina.php";
+        require "Modules/feed/engine/PHPFina.php";
         $phpfina = new PHPFina(array('datadir'=>"/var/lib/phpfina/"));
     
     // Starting kWh of feed, default:0
@@ -29,6 +33,7 @@
     $filesize = filesize($dir."feed_$feedid.MYD");
     
     $npoints = floor($filesize / 9.0);
+    $time = 0;
     
     for ($i=0; $i<$npoints; $i++)
     {
@@ -66,7 +71,7 @@
             // rather than enter 0 we enter the last value
             $kwh = $kwh;
         }
-        
+        //print $time." ".$kwh."\n";
         //------------------------------------------------
         // 3) Save value to phpfina feed
         //------------------------------------------------
