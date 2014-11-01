@@ -31,7 +31,6 @@
     $kwh = 0;
     $time = 0;
     
-    // Set the source feed engine here:
     while ($dp = $engine[$source_engine]->readnext($source))
     {
         $last_time = $time;
