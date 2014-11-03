@@ -4,6 +4,7 @@
     require "Lib/PHPFina.php";
     require "Lib/PHPFiwa.php";
     require "Lib/PHPTimeSeries.php";
+    require "Lib/PHPTimestore.php";
     
     define('EMONCMS_EXEC', 1);
     chdir("/var/www/emoncms");
@@ -14,14 +15,14 @@
     $engine[Engine::PHPFINA] = new PHPFina($feed_settings['phpfina']);
     $engine[Engine::PHPFIWA] = new PHPFiwa($feed_settings['phpfiwa']);
     $engine[Engine::PHPTIMESERIES] = new PHPTimeSeries($feed_settings['phptimeseries']);
-    
+    $engine[Engine::PHPTIMESTORE] = new PHPTimestore($feed_settings['phptimestore']);
     //=============================================================================
     // SETTINGS:
     
-    $source = 27;
-    $source_engine = Engine::PHPFINA;   // or: Engine::PHPFINA, Engine::PHPTIMESERIES
+    $source = 48421;
+    $source_engine = Engine::PHPTIMESTORE;   // or: Engine::PHPFINA, Engine::PHPTIMESERIES
     
-    $target = 50484;                    // must be a PHPFINA feed
+    $target = 50485;                    // must be a PHPFINA feed
     
     $low_memory_mode = false;           // set this to true if you experience low memory errors
                                         // may not make any difference
