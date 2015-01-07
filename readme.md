@@ -30,7 +30,7 @@ A tool for checking the integrity of your emoncms phpfiwa, phpfina, phptimeserie
 
     php integritycheck.php
     
-## Covert data
+## Convert data
 
 There are two scripts for converting phpfiwa or phptimestore to phpfina. PHPFina has a much lower write load when used as the storage engine on SD Cards. Using these conversion scripts you can convert your data to PHPFina so that it can be used with the new SD Card branch of emoncms called 'bufferedwrite'
 
