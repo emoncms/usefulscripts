@@ -1,24 +1,46 @@
 <?php
-
     define('EMONCMS_EXEC', 1);
-    chdir("/var/www/emoncms");
+    print "timestore/phptimestore to phpfina conversion script\n";
+    
+    $emoncms_dir = "/var/www/emoncms";
+    $timestore_dir = "/var/lib/timestore/";
+    $phpfina_dir = "/var/lib/phpfina/";
+    
+    if (!file_exists($emoncms_dir)) {
+        print "Could not open ".$emoncms_dir."\n";
+        die;
+    }
+    
+    if (!file_exists($timestore_dir)) {
+        print "Could not open ".$timestore_dir."\n";
+        die;
+    }
+    
+    if (!file_exists($phpfina_dir)) {
+        print "Could not open ".$phpfina_dir."\n";
+        die;
+    }
+    
+    chdir($emoncms_dir);
     require "process_settings.php";
     $mysqli = @new mysqli($server,$username,$password,$database);
     
-    $redis = new Redis();
-    $redis->connect("127.0.0.1");
+    $redis = false;
+    if (class_exists('Redis'))
+    {
+        $redis = new Redis();
+        $redis->connect("127.0.0.1");
+        if (!$connected) {
+            print "Could not connect to redis\n";
+            $redis = false;
+        }
+    }
     
-    // Directory of phpfina feeds, see: settings.php
-    $dir = "/var/lib/timestore/";
-    $phpfina_dir = "/var/lib/phpfina/";
-    
-    $result = $mysqli->query("SELECT * FROM feeds WHERE `engine`= 4");
-    
-    // Feed id to read: 
+    $result = $mysqli->query("SELECT * FROM feeds WHERE `engine`= 4 OR `engine`=1");
     
     while($row = $result->fetch_array())
     {
-        print $row['userid']." ".$row['id']." ".$row['name']."\n";
+        print "userid:".$row['userid']." feed:".$row['id']." name:".$row['name']."\n";
         
         $id = $row['id'];
         
@@ -26,7 +48,7 @@
         $meta = new stdClass();
         
         $feedname = str_pad($id, 16, '0', STR_PAD_LEFT).".tsdb";
-        $metafile = fopen($dir.$feedname, 'rb');
+        $metafile = fopen($timestore_dir.$feedname, 'rb');
         
         fseek($metafile,(8+8+4+4));
           
@@ -44,11 +66,13 @@
         fwrite($metafile,pack("I",$meta->start_time)); 
         fclose($metafile);
         
-        $sourcedata = $dir.str_pad($id, 16, '0', STR_PAD_LEFT)."_0_.dat";
+        $sourcedata = $timestore_dir.str_pad($id, 16, '0', STR_PAD_LEFT)."_0_.dat";
         $targetdata = $phpfina_dir.$id.".dat";
         
+        print "mv $sourcedata $targetdata\n";
         exec("mv $sourcedata $targetdata");
         
-        $redis->hset("feed:$id","engine",5);
+        if ($redis) $redis->hset("feed:$id","engine",5);
         $mysqli->query("UPDATE feeds SET `engine`=5 WHERE `id`='$id'");
+        print "Feed $id is now PHPFina\n";
     }
