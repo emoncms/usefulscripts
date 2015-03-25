@@ -38,7 +38,7 @@
     
     $result = $mysqli->query("Show columns from feeds like 'timestore'");
     $row = $result->fetch_array();
-    if ($row) $mysqli->query("UPDATE feeds SET `engine`='1' WHERE `timestore`='1'");
+    if ($row) $mysqli->query("UPDATE feeds SET `engine`='1' WHERE `timestore`='1' AND `engine`<4");
     
     $result = $mysqli->query("SELECT * FROM feeds WHERE `engine`= 4 OR `engine`=1");
     print "There are ".$result->num_rows." feeds to convert, would you like to continue?";
