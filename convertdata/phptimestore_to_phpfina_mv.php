@@ -29,7 +29,7 @@
     if (class_exists('Redis'))
     {
         $redis = new Redis();
-        $redis->connect("127.0.0.1");
+        $connected = $redis->connect("127.0.0.1");
         if (!$connected) {
             print "Could not connect to redis\n";
             $redis = false;
@@ -37,6 +37,12 @@
     }
     
     $result = $mysqli->query("SELECT * FROM feeds WHERE `engine`= 4 OR `engine`=1");
+    print "There are ".$result->num_rows." feeds to convert, would you like to continue?";
+    $handle = fopen ("php://stdin","r");
+    $line = fgets($handle);
+    if(trim($line) != 'y'){
+        exit;
+    }
     
     while($row = $result->fetch_array())
     {
