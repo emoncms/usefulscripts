@@ -75,8 +75,8 @@
         $sourcedata = $timestore_dir.str_pad($id, 16, '0', STR_PAD_LEFT)."_0_.dat";
         $targetdata = $phpfina_dir.$id.".dat";
         
-        print "mv $sourcedata $targetdata\n";
-        exec("mv $sourcedata $targetdata");
+        print "cp $sourcedata $targetdata\n";
+        exec("cp $sourcedata $targetdata");
         
         if ($redis) $redis->hset("feed:$id","engine",5);
         $mysqli->query("UPDATE feeds SET `engine`=5 WHERE `id`='$id'");
