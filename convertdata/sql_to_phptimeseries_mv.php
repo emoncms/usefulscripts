@@ -88,7 +88,6 @@
 			print("PHPTimeSeries file create failed for feedid=$id");
 		}
 	
-		exit; //Debug, run only once
 		
 	}
 	
