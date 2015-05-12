@@ -27,7 +27,7 @@
 	require "PHPTimeSeries.php";
 	$engine = new PHPTimeSeries(array('datadir'=>$timeseries_dir));
 	
-	$result = $mysqli->query("SELECT * FROM feeds WHERE `engine`= 0");
+	$result = $mysqli->query("SELECT * FROM feeds WHERE `engine`= 0 AND `datatype`= 2");
 	print "There are ".$result->num_rows." feeds to convert, would you like to continue?(y/n) ";
 	$handle = fopen ("php://stdin","r");
 	$line = fgets($handle);
