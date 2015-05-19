@@ -205,7 +205,7 @@ if ($apply) {
     }
 
 }
-
+if ($redis) $redis->flushall();
 unlink("/tmp/migratelock");
 ?>
 </pre>
