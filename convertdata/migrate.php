@@ -147,7 +147,11 @@ if ($apply) {
             print "found timestore metafile:\n";
             print "- start_time: ".$meta->start_time."\n";
             print "- interval: ".$meta->interval."\n";
-                   
+            
+            if (file_exists($phpfina_dir.$id.".meta")) {
+                print "phpfina metafile already exists\n";
+            } else {
+            
             if ($metafile = fopen($phpfina_dir.$id.".meta", 'wb'))
             {
                 print "creating phpfina metafile\n";
@@ -159,15 +163,21 @@ if ($apply) {
             
                 $sourcedata = $timestore_dir.str_pad($id, 16, '0', STR_PAD_LEFT)."_0_.dat";
                 $targetdata = $phpfina_dir.$id.".dat";
-                print "copying timestore data over to phpfina data folder\n";
-                print "cp $sourcedata $targetdata\n";
-                exec("cp $sourcedata $targetdata");
                 
-                if ($redis) $redis->hset("feed:$id","engine",5);
-                $mysqli->query("UPDATE feeds SET `engine`=5 WHERE `id`='$id'");
-                print "Feed $id is now PHPFina\n";
+                if (file_exists($targetdata)) {
+                    print "phpfina data file already exists\n";
+                } else {
+                    print "copying timestore data over to phpfina data folder\n";
+                    print "cp $sourcedata $targetdata\n";
+                    exec("cp $sourcedata $targetdata");
+                
+                    if ($redis) $redis->hset("feed:$id","engine",5);
+                    $mysqli->query("UPDATE feeds SET `engine`=5 WHERE `id`='$id'");
+                    print "Feed $id is now PHPFina\n";
+                }
             } else {
                 print "could not create phpfina meta file\n";
+            }
             }
         } else {
             print "could not open timestore meta file!\n";
