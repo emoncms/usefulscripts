@@ -204,8 +204,6 @@ if ($apply) {
         }
     }
 
-sleep(60);
-
 }
 
 unlink("/tmp/migratelock");
