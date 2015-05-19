@@ -152,32 +152,32 @@ if ($apply) {
                 print "phpfina metafile already exists\n";
             } else {
             
-            if ($metafile = fopen($phpfina_dir.$id.".meta", 'wb'))
-            {
-                print "creating phpfina metafile\n";
-                fwrite($metafile,pack("I",0));
-                fwrite($metafile,pack("I",0));
-                fwrite($metafile,pack("I",$meta->interval));
-                fwrite($metafile,pack("I",$meta->start_time));
-                fclose($metafile);
-            
-                $sourcedata = $timestore_dir.str_pad($id, 16, '0', STR_PAD_LEFT)."_0_.dat";
-                $targetdata = $phpfina_dir.$id.".dat";
+                if ($metafile = fopen($phpfina_dir.$id.".meta", 'wb'))
+                {
+                    print "creating phpfina metafile\n";
+                    fwrite($metafile,pack("I",0));
+                    fwrite($metafile,pack("I",0));
+                    fwrite($metafile,pack("I",$meta->interval));
+                    fwrite($metafile,pack("I",$meta->start_time));
+                    fclose($metafile);
                 
-                if (file_exists($targetdata)) {
-                    print "phpfina data file already exists\n";
+                    $sourcedata = $timestore_dir.str_pad($id, 16, '0', STR_PAD_LEFT)."_0_.dat";
+                    $targetdata = $phpfina_dir.$id.".dat";
+                    
+                    if (file_exists($targetdata)) {
+                        print "phpfina data file already exists\n";
+                    } else {
+                        print "copying timestore data over to phpfina data folder\n";
+                        print "cp $sourcedata $targetdata\n";
+                        exec("cp $sourcedata $targetdata");
+                    
+                        if ($redis) $redis->hset("feed:$id","engine",5);
+                        $mysqli->query("UPDATE feeds SET `engine`=5 WHERE `id`='$id'");
+                        print "Feed $id is now PHPFina\n";
+                    }
                 } else {
-                    print "copying timestore data over to phpfina data folder\n";
-                    print "cp $sourcedata $targetdata\n";
-                    exec("cp $sourcedata $targetdata");
-                
-                    if ($redis) $redis->hset("feed:$id","engine",5);
-                    $mysqli->query("UPDATE feeds SET `engine`=5 WHERE `id`='$id'");
-                    print "Feed $id is now PHPFina\n";
+                    print "could not create phpfina meta file\n";
                 }
-            } else {
-                print "could not create phpfina meta file\n";
-            }
             }
         } else {
             print "could not open timestore meta file!\n";
@@ -201,23 +201,28 @@ if ($apply) {
         $current_feed_value = $row['value'];
         print "- current value is: $current_feed_value\n";
         
-        $engineresult = $phptimeseries->create($id,0);
-        if ($engineresult == true) {
-            print "created phptimeseries feed\n";
-	        $data = $mysqli->query("SELECT * FROM feed_{$id}");
-	        print "copying ".$data->num_rows." datapoints\n";
-            while($row = $data->fetch_array()) {
-                $postresult = $phptimeseries->post($id,$row['time'],$row['data']);
-            }
-            
-            $mysqli->query("UPDATE feeds SET `engine`=2 WHERE `id`='$id'");
-            $mysqli->query("UPDATE feeds SET `value`=$current_feed_value WHERE `id`='$id'");
-
-            if ($redis) $redis->hset("feed:$id","engine",2);
-            print "Feed $id is now PHPTimeseries\n";        
-            
+        if (file_exists($phptimeseries_dir."feed_$feedid.MYD")) {
+            print "phptimeseries data file already exists\n";
         } else {
-            print "could not create phptimeseries feed\n";
+        
+            $engineresult = $phptimeseries->create($id,0);
+            if ($engineresult == true) {
+                print "created phptimeseries feed\n";
+	            $data = $mysqli->query("SELECT * FROM feed_{$id}");
+	            print "copying ".$data->num_rows." datapoints\n";
+                while($row = $data->fetch_array()) {
+                    $postresult = $phptimeseries->post($id,$row['time'],$row['data']);
+                }
+                
+                $mysqli->query("UPDATE feeds SET `engine`=2 WHERE `id`='$id'");
+                $mysqli->query("UPDATE feeds SET `value`=$current_feed_value WHERE `id`='$id'");
+
+                if ($redis) $redis->hset("feed:$id","engine",2);
+                print "Feed $id is now PHPTimeseries\n";        
+                
+            } else {
+                print "could not create phptimeseries feed\n";
+            }
         }
     }
 
