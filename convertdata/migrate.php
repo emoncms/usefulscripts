@@ -74,6 +74,13 @@ if ($apply) {
 
 print "\n";
 
+if (file_exists($timestore_dir)) {
+    print "$timestore_dir exists\t\t[OK]\n"; 
+} else {
+    print "timestore directory does not exist at: $timestore_dir, is this the correct location?\n";
+    exit;
+}
+
 if (file_exists($phpfina_dir)) {
     print "$phpfina_dir exists\t\t[OK]\n"; 
 } else {
