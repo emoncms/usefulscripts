@@ -131,10 +131,19 @@ class PHPFina
                 $this->buffers[$filename] = "";    
             }
             
+            $this->padding_mode = "join";
             if ($npadding>0) {
+                $padding_value = NAN;
+                if ($this->padding_mode=="join") {
+                    $last = $this->lastvalue($filename);
+                    $div = ($value - $last['value']) / ($npadding+1);
+                    $padding_value = $last['value'];
+                }
+                
                 for ($n=0; $n<$npadding; $n++)
                 {
-                    $this->buffers[$filename] .= pack("f",NAN);
+                    if ($this->padding_mode=="join") $padding_value += $div; 
+                    $this->buffers[$filename] .= pack("f",$padding_value);
                 }
             }
             

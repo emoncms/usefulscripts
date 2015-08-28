@@ -8,26 +8,38 @@
     
     define('EMONCMS_EXEC', 1);
     chdir("/var/www/emoncms");
-    require "Modules/log/EmonLogger.php";
+    require "Lib/EmonLogger.php";
     require "process_settings.php";
     
     $engine = array();
     $engine[Engine::PHPFINA] = new PHPFina($feed_settings['phpfina']);
     $engine[Engine::PHPFIWA] = new PHPFiwa($feed_settings['phpfiwa']);
     $engine[Engine::PHPTIMESERIES] = new PHPTimeSeries($feed_settings['phptimeseries']);
-    $engine[Engine::PHPTIMESTORE] = new PHPTimestore($feed_settings['phptimestore']);
     //=============================================================================
     // SETTINGS:
     
-    $source = 1;
+    $source = 22;
+    
     $source_engine = Engine::PHPFINA;   // or: Engine::PHPFINA, Engine::PHPTIMESERIES
     
-    $target = 2;                    // must be a PHPFINA feed
+    $target = 23;                    // must be a PHPFINA feed
     
-    $low_memory_mode = false;           // set this to true if you experience low memory errors
+    $low_memory_mode = true;           // set this to true if you experience low memory errors
                                         // may not make any difference
     //=============================================================================
         
+    echo "Power to kWh processor feed $source -> feed $target\n";
+        
+        
+    if ($source_engine==Engine::PHPFINA) {
+        echo "Deleting data for ".$feed_settings['phpfina']['datadir'].$target.".dat\n";
+        unlink($feed_settings['phpfina']['datadir'].$target.".dat");
+        
+        echo "Creating new data file\n";
+        $fh = fopen($feed_settings['phpfina']['datadir'].$target.".dat", 'wb');
+        fclose($fh);
+    }
+    
     // Starting kWh of feed, default:0
     $kwh = 0;
     $time = 0;
@@ -61,7 +73,7 @@
                 $kwh = $kwh;
             }
             
-            //print $time." ".$kwh."\n";
+            // print $time." ".$kwh."\n";
             //------------------------------------------------
             // 3) Save value to phpfina feed
             //------------------------------------------------
