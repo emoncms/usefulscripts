@@ -19,10 +19,10 @@
     //=============================================================================
     // SETTINGS:
     
-    $source = 48421;
-    $source_engine = Engine::PHPTIMESTORE;   // or: Engine::PHPFINA, Engine::PHPTIMESERIES
+    $source = 1;
+    $source_engine = Engine::PHPFINA;   // or: Engine::PHPFINA, Engine::PHPTIMESERIES
     
-    $target = 50485;                    // must be a PHPFINA feed
+    $target = 2;                    // must be a PHPFINA feed
     
     $low_memory_mode = false;           // set this to true if you experience low memory errors
                                         // may not make any difference
