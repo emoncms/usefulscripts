@@ -1,5 +1,5 @@
 #! /bin/sh
-
+#
 # Installation
 # 1) Move this to /etc/init.d/ folder
 # 2) sudo chown root:root /etc/init.d/phpmqtt_input
@@ -9,6 +9,18 @@
 # Starting and stopping
 # - Start: `sudo service phpmqtt_input start` or `sudo /etc/init.d/phpmqtt_input start`
 # - Stop: `sudo service phpmqtt_input stop` or `sudo /etc/init.d/phpmqtt_input stop`
+#
+### BEGIN INIT INFO
+# Provides: phpmqtt_input
+# Required-Start: $remote_fs $syslog
+# Required-Stop: $remote_fs $syslog
+# Should-Start: $all
+# Should-Stop: $all
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Starts phpmqtt_input agent daemon at boot time
+# Description: Starts phpmqtt_input agent daemon at boot time
+### END INIT INFO
 
 NAME=phpmqtt_input
 DESC="Daemon for the emoncms MQTT script"
