@@ -30,7 +30,7 @@ A tool for checking the integrity of your emoncms phpfiwa, phpfina, phptimeserie
 
     php integritycheck.php
     
-## Covert data
+## Convert data
 
 There are two scripts for converting phpfiwa or phptimestore to phpfina. PHPFina has a much lower write load when used as the storage engine on SD Cards. Using these conversion scripts you can convert your data to PHPFina so that it can be used with the new SD Card branch of emoncms called 'bufferedwrite'
 
@@ -52,3 +52,36 @@ for example to remove value above 5.5V and below 1V (battery feed in V for examp
     sudo php remove_spike.php -i 22 -n 1 -x 5.5
 
 ONLY WORKS WITH PHPFIWA DATA!
+
+## MQTT-Daemon
+
+This is a init file to start/stop/restart the phpmqtt.php script, which is required to enable emonmcms to subscribe to MQTT topics.
+
+#### Installation
+
+1. Move this file to the /etc/init.d/ folder
+2. $ sudo chown root:root /etc/init.d/phpmqtt_input
+3. $ sudo chmod +x /etc/init.d/phpmqtt_input
+4. $ sudo update-rc.d phpmqtt_input defaults
+
+#### Starting and stopping
+
+Start:
+
+    $ sudo service phpmqtt_input start
+    
+or
+
+    $ sudo /etc/init.d/phpmqtt_input start
+    
+Stop:
+
+    $ sudo service phpmqtt_input stop
+    
+or
+
+    $ sudo /etc/init.d/phpmqtt_input stop
+    
+Show process ID:
+
+    $ cat /var/run/phpmqtt_input.pid
