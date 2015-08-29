@@ -64,6 +64,13 @@ This is a init file to start/stop/restart the phpmqtt.php script, which is requi
 4. update-rc.d phpmqtt_input defaults
 
 #### Starting and stopping
-Start: $ sudo service phpmqtt_input start or $ sudo /etc/init.d/phpmqtt_input start
-Stop: $ sudo service phpmqtt_input stop or $ sudo /etc/init.d/phpmqtt_input stop
-Show process ID: $ cat /var/run/phpmqtt_input.pid
+Start:
+    $ sudo service phpmqtt_input start
+or
+    $ sudo /etc/init.d/phpmqtt_input start
+Stop:
+    $ sudo service phpmqtt_input stop
+or
+    $ sudo /etc/init.d/phpmqtt_input stop
+Show process ID:
+    $ cat /var/run/phpmqtt_input.pid
