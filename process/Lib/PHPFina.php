@@ -322,6 +322,7 @@ class PHPFina
                $d = fread($fh,4);
               fclose($fh);
             }
+            if (strlen($d)!=4) return array('time'=>0, 'value'=>0);
             
             $val = unpack("f",$d);
             $time = date("Y-n-j H:i:s", $meta->start_time + $meta->interval * $meta->npoints);
