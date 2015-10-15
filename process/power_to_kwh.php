@@ -65,7 +65,12 @@
     $source_engine = $row["engine"];
     
     $interval = 10;
-    if ($row["engine"]==5) $sourcemeta = $engine[Engine::PHPFINA]->get_meta($source);
+    if ($row["engine"]==Engine::PHPFINA) $sourcemeta = $engine[Engine::PHPFINA]->get_meta($source);
+    if ($row["engine"]==Engine::PHPFIWA) $sourcemeta = $engine[Engine::PHPFIWA]->get_meta($source);
+    if ($row["engine"]==Engine::PHPTIMESERIES) {
+        $sourcemeta = new stdClass();
+        $sourcemeta->interval = 60;
+    }
     
     // Create new feed or overwrite existing
     echo "\n";
