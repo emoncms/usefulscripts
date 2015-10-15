@@ -1,51 +1,150 @@
 <?php
-    
-    $start = microtime(true);
+
+    define('EMONCMS_EXEC', 1);
+    $low_memory_mode = false;
+
+    echo "------------------------------------------------------\n";
+    echo "Power to kWh feed processor\n";
+    echo "------------------------------------------------------\n";
+
+    // Select emoncms directory
+    echo "\n";
+    $setup = readline("Is your setup a standard emonpi or emonbase? (Y/N): ");
+
+    if ($setup=="y" || $setup=="Y") {
+        $emoncmsdir = "/var/www/emoncms";
+    } else {
+        $emoncmsdir = readline("Please enter root directory of your emoncms installation (i.e /var/www/emoncms): ");
+    }
+
+    chdir($emoncmsdir);
+
+    if (!file_exists("process_settings.php")) {
+        echo "ERROR: This is not a valid emoncms directory, please retry\n"; die;
+    }
+
+    // Load emoncms install
+    require "process_settings.php";
+    require "Modules/log/EmonLogger.php";
+    $mysqli = @new mysqli($server,$username,$password,$database);
+
+    if (class_exists('Redis') && $redis_enabled) {
+        $redis = new Redis();
+        $connected = $redis->connect("127.0.0.1");
+        if (!$connected) {
+            echo "Can't connect to redis database, it may be that redis-server is not installed or started see readme for redis installation"; die;
+        }
+    } else {
+        $redis = false;
+    }
+
     require "Lib/PHPFina.php";
     require "Lib/PHPFiwa.php";
     require "Lib/PHPTimeSeries.php";
-    require "Lib/PHPTimestore.php";
-    
-    define('EMONCMS_EXEC', 1);
-    chdir("/var/www/emoncms");
-    require "Lib/EmonLogger.php";
-    require "process_settings.php";
-    
+
     $engine = array();
     $engine[Engine::PHPFINA] = new PHPFina($feed_settings['phpfina']);
     $engine[Engine::PHPFIWA] = new PHPFiwa($feed_settings['phpfiwa']);
     $engine[Engine::PHPTIMESERIES] = new PHPTimeSeries($feed_settings['phptimeseries']);
-    //=============================================================================
-    // SETTINGS:
-    
-    $source = 22;
-    
-    $source_engine = Engine::PHPFINA;   // or: Engine::PHPFINA, Engine::PHPTIMESERIES
-    
-    $target = 23;                    // must be a PHPFINA feed
-    
-    $low_memory_mode = true;           // set this to true if you experience low memory errors
-                                        // may not make any difference
-    //=============================================================================
-        
-    echo "Power to kWh processor feed $source -> feed $target\n";
-        
-        
-    if ($source_engine==Engine::PHPFINA) {
-        echo "Deleting data for ".$feed_settings['phpfina']['datadir'].$target.".dat\n";
-        unlink($feed_settings['phpfina']['datadir'].$target.".dat");
-        
-        echo "Creating new data file\n";
-        $fh = fopen($feed_settings['phpfina']['datadir'].$target.".dat", 'wb');
-        fclose($fh);
+
+    // Power feed selection
+    echo "\n";
+    $source = (int) readline("Please enter feedid of the power feed you wish to use to generate the accumulating kWh feed: ");
+
+    $result = $mysqli->query("SELECT * FROM feeds WHERE id='".$source."'");
+    if (!$result->num_rows) {
+        echo "ERROR: Power feed does not exist\n"; die;
     }
+    $row = $result->fetch_array();
+
+    $enginename = "";
+    if ($row["engine"]==5) $enginename = "PHPFINA";
+    echo "Power feed selected: ".$row['name']." Engine: ".$enginename."\n";
+
+    $userid = $row["userid"];
+    $source_engine = $row["engine"];
+    
+    $interval = 10;
+    if ($row["engine"]==5) $sourcemeta = $engine[Engine::PHPFINA]->get_meta($source);
+    
+    // Create new feed or overwrite existing
+    echo "\n";
+    $new_or_overwrite = (int) readline("Would you like to create a new feed or overwrite an existing feed? enter 1 for new, 2 for overwrite: ");
+    
+    $target = 0;
+    
+    if ($new_or_overwrite==1) {   
+        $new_kwh_feed = $row['name']." kwh";
+
+        $datatype = DataType::REALTIME;
+        $setengine = Engine::PHPFINA;
+        $result = $mysqli->query("INSERT INTO feeds (userid,name,datatype,public,engine) VALUES ('$userid','$new_kwh_feed','$datatype',false,'$setengine')");
+        $target = $mysqli->insert_id;
+    }
+    
+    if ($new_or_overwrite==2) {
+        $target = (int) readline("Please enter feedid of the accumulating kwh feed you wish to overwrite: ");
+        if ($target==$source) {
+            echo "ERROR: kWh feedid must be different from the power feedid\n"; die;
+        }
+        $result = $mysqli->query("SELECT * FROM feeds WHERE id='".$target."'");
+        if (!$result->num_rows) {
+            echo "ERROR: kWh feed does not exist\n"; die;
+        }
+        
+        if ($row["engine"]!=5) {
+            echo "ERROR: kWh feed must be a PHPFINA feed\n"; die;
+        }
+        echo "Power feed selected: ".$row['name']." Engine: PHPFINA\n";
+    }
+
+    // force a reload of the feeds table
+    if ($redis && $redis->exists("user:feeds:$userid")) {
+        $redis->del("user:feeds:$userid");
+        $redis->del("feed:lastvalue:$target");
+    }
+        
+    if ($target==0) die;
+
+    $start = microtime(true);
+  
+    //=============================================================================
+    echo "\n";
+    echo "Power to kWh processor feed $source -> feed $target\n";
+    
+    $interval = $sourcemeta->interval;
+    echo "Output interval: ".$interval."s\n";
+    
+    echo "Would you like to modify the kwh feed interval to be longer than the interval above?\n";
+    echo "This will reduce disk space use\n";
+    
+    $modinterval = (int) readline(":");
+    
+    if ($modinterval>$interval) {
+        if ($modinterval%10!=0) {
+            echo "ERROR: interval given needs to be a multiple of 10, using source interval\n";
+        } else {
+            $interval = $modinterval;
+        }
+    }
+    
+    
+    $engine[Engine::PHPFINA]->delete($target);
+    $engine[Engine::PHPFINA]->create($target,array("interval"=>$interval));
     
     // Starting kWh of feed, default:0
     $kwh = 0;
     $time = 0;
     
+    $ptime = time();
+    
     while ($dp = $engine[$source_engine]->readnext($source))
     {
+        if ((time()-$ptime)>1.0) {
+            $ptime = time();
+            print ".";
+        }
+    
         $last_time = $time;
         
         if (!is_nan($dp['value'])) {
@@ -87,3 +186,12 @@
     $engine[Engine::PHPFINA]->save();
     
     print "Recalculated in ".round(microtime(true)-$start)."s\n";
+    
+    exec("chown www-data:www-data ".$feed_settings['phpfina']['datadir'].$target.".meta");
+    exec("chown www-data:www-data ".$feed_settings['phpfina']['datadir'].$target.".dat");
+    
+    // force a reload of the feeds table
+    if ($redis && $redis->exists("user:feeds:$userid")) {
+        $redis->del("user:feeds:$userid");
+        $redis->del("feed:lastvalue:$target");
+    }

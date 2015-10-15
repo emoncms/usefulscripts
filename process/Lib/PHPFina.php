@@ -311,12 +311,18 @@ class PHPFina
         
         if ($meta->npoints>0)
         {
-            $fh = fopen($this->dir.$id.".dat", 'rb');
-            $size = $meta->npoints*4;
-            fseek($fh,$size-4);
-             $d = fread($fh,4);
-            fclose($fh);
-
+            if (strlen($this->buffers[$id])>0) {
+              $lastpos = strlen($this->buffers[$id]) - 4;
+              $d = substr($this->buffers[$id],$lastpos,4);
+              
+            } else {
+              $fh = fopen($this->dir.$id.".dat", 'rb');
+              $size = $meta->npoints*4;
+              fseek($fh,$size-4);
+               $d = fread($fh,4);
+              fclose($fh);
+            }
+            
             $val = unpack("f",$d);
             $time = date("Y-n-j H:i:s", $meta->start_time + $meta->interval * $meta->npoints);
             
@@ -333,6 +339,7 @@ class PHPFina
         if (!$meta = $this->get_meta($id)) return false;
         unlink($this->dir.$id.".meta");
         unlink($this->dir.$id.".dat");
+        unset($this->metadata_cache[$id]);
     }
     
     public function get_feed_size($id)
