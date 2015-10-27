@@ -1,8 +1,12 @@
 <?php
-
-    define('EMONCMS_EXEC', 1);
     $low_memory_mode = false;
+    define('EMONCMS_EXEC', 1);
 
+    require "Lib/PHPFina.php";
+    require "Lib/PHPFiwa.php";
+    require "Lib/PHPTimeSeries.php";
+    require "Lib/EmonLogger.php";
+    
     echo "------------------------------------------------------\n";
     echo "Power to kWh feed processor\n";
     echo "------------------------------------------------------\n";
@@ -25,7 +29,7 @@
 
     // Load emoncms install
     require "process_settings.php";
-    require "Modules/log/EmonLogger.php";
+    
     $mysqli = @new mysqli($server,$username,$password,$database);
 
     if (class_exists('Redis') && $redis_enabled) {
@@ -37,10 +41,6 @@
     } else {
         $redis = false;
     }
-
-    require "Lib/PHPFina.php";
-    require "Lib/PHPFiwa.php";
-    require "Lib/PHPTimeSeries.php";
 
     $engine = array();
     $engine[Engine::PHPFINA] = new PHPFina($feed_settings['phpfina']);
