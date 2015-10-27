@@ -97,6 +97,7 @@
             echo "ERROR: kWh feed does not exist\n"; die;
         }
         
+        $row = $result->fetch_array();
         if ($row["engine"]!=5) {
             echo "ERROR: kWh feed must be a PHPFINA feed\n"; die;
         }
