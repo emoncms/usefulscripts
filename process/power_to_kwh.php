@@ -118,7 +118,8 @@
     echo "\n";
     echo "Power to kWh processor feed $source -> feed $target\n";
     
-    $interval = $sourcemeta->interval;
+    if ($source_engine==5) $interval = $sourcemeta->interval;
+    if ($source_engine==6) $interval = $sourcemeta->interval[0];
     echo "Output interval: ".$interval."s\n";
     
     echo "Would you like to modify the kwh feed interval to be longer than the interval above?\n";
