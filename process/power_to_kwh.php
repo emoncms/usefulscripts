@@ -9,12 +9,12 @@
 
     // Select emoncms directory
     echo "\n";
-    $setup = readline("Is your setup a standard emonpi or emonbase? (Y/N): ");
+    $setup = stdin("Is your setup a standard emonpi or emonbase? (Y/N): ");
 
     if ($setup=="y" || $setup=="Y") {
         $emoncmsdir = "/var/www/emoncms";
     } else {
-        $emoncmsdir = readline("Please enter root directory of your emoncms installation (i.e /var/www/emoncms): ");
+        $emoncmsdir = stdin("Please enter root directory of your emoncms installation (i.e /var/www/emoncms): ");
     }
 
     chdir($emoncmsdir);
@@ -49,7 +49,7 @@
 
     // Power feed selection
     echo "\n";
-    $source = (int) readline("Please enter feedid of the power feed you wish to use to generate the accumulating kWh feed: ");
+    $source = (int) stdin("Please enter feedid of the power feed you wish to use to generate the accumulating kWh feed: ");
 
     $result = $mysqli->query("SELECT * FROM feeds WHERE id='".$source."'");
     if (!$result->num_rows) {
@@ -74,7 +74,7 @@
     
     // Create new feed or overwrite existing
     echo "\n";
-    $new_or_overwrite = (int) readline("Would you like to create a new feed or overwrite an existing feed? enter 1 for new, 2 for overwrite: ");
+    $new_or_overwrite = (int) stdin("Would you like to create a new feed or overwrite an existing feed? enter 1 for new, 2 for overwrite: ");
     
     $target = 0;
     
@@ -88,7 +88,7 @@
     }
     
     if ($new_or_overwrite==2) {
-        $target = (int) readline("Please enter feedid of the accumulating kwh feed you wish to overwrite: ");
+        $target = (int) stdin("Please enter feedid of the accumulating kwh feed you wish to overwrite: ");
         if ($target==$source) {
             echo "ERROR: kWh feedid must be different from the power feedid\n"; die;
         }
@@ -123,7 +123,7 @@
     echo "Would you like to modify the kwh feed interval to be longer than the interval above?\n";
     echo "This will reduce disk space use\n";
     
-    $modinterval = (int) readline(":");
+    $modinterval = (int) stdin(":");
     
     if ($modinterval>$interval) {
         if ($modinterval%10!=0) {
@@ -133,6 +133,8 @@
         }
     }
     
+    echo "\n Would you like to remove erroneous high power spikes?\n"; 
+    $maxpowerlevel = (int)stdin("set max power level to accept here:");
     
     $engine[Engine::PHPFINA]->delete($target);
     $engine[Engine::PHPFINA]->create($target,array("interval"=>$interval));
@@ -149,43 +151,46 @@
             $ptime = time();
             print ".";
         }
-    
-        $last_time = $time;
         
         if (!is_nan($dp['value'])) {
-        
-            $time = $dp['time'];
+            
             $power = $dp['value'];
+            
+            if ($power<$maxpowerlevel) {
 
-            //------------------------------------------------
-            // 2) Calculate increase in kWh and next total kwh value
-            //------------------------------------------------
-               
-            // only update if last datapoint was less than 2 hour old
-            // this is to reduce the effect of monitor down time on creating
-            // often large kwh readings.
-            if ($last_time && ($time-$last_time)<7200)
-            {
-                // kWh calculation
-                $time_elapsed = ($time - $last_time);
-                $kwh_inc = ($time_elapsed * $power) / 3600000.0;
-                $kwh += $kwh_inc;
-            } else {
-                // in the event that redis is flushed the last time will
-                // likely be > 7200s ago and so kwh inc is not calculated
-                // rather than enter 0 we enter the last value
-                $kwh = $kwh;
+                $last_time = $time;
+                $time = $dp['time'];
+                //------------------------------------------------
+                // 2) Calculate increase in kWh and next total kwh value
+                //------------------------------------------------
+                   
+                // only update if last datapoint was less than 2 hour old
+                // this is to reduce the effect of monitor down time on creating
+                // often large kwh readings.
+                if ($last_time && ($time-$last_time)<7200)
+                {
+                    // kWh calculation
+                    $time_elapsed = ($time - $last_time);
+                    $kwh_inc = ($time_elapsed * $power) / 3600000.0;
+                    $kwh += $kwh_inc;
+                } else {
+                    // in the event that redis is flushed the last time will
+                    // likely be > 7200s ago and so kwh inc is not calculated
+                    // rather than enter 0 we enter the last value
+                    $kwh = $kwh;
+                }
+                
+                // print $time." ".$kwh."\n";
+                //------------------------------------------------
+                // 3) Save value to phpfina feed
+                //------------------------------------------------
+                
+                // Save $kwh to feed
+                // print $time." "+$kwh."\n";
+                $engine[Engine::PHPFINA]->prepare($target,$time,$kwh);
+                if ($low_memory_mode) $engine[Engine::PHPFINA]->save();
+            
             }
-            
-            // print $time." ".$kwh."\n";
-            //------------------------------------------------
-            // 3) Save value to phpfina feed
-            //------------------------------------------------
-            
-            // Save $kwh to feed
-            // print $time." "+$kwh."\n";
-            $engine[Engine::PHPFINA]->prepare($target,$time,$kwh);
-            if ($low_memory_mode) $engine[Engine::PHPFINA]->save();
         }
     }
     $engine[Engine::PHPFINA]->save();
@@ -199,4 +204,15 @@
     if ($redis && $redis->exists("user:feeds:$userid")) {
         $redis->del("user:feeds:$userid");
         $redis->del("feed:lastvalue:$target");
+    }
+    
+
+
+    function stdin($prompt = null){
+        if($prompt){
+            echo $prompt;
+        }
+        $fp = fopen("php://stdin","r");
+        $line = rtrim(fgets($fp, 1024));
+        return $line;
     }
