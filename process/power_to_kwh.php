@@ -196,6 +196,7 @@
         }
     }
     $engine[Engine::PHPFINA]->save();
+    $mysqli->query("UPDATE feeds SET value= '".$kwh."' WHERE id='".$target."'");
     
     print "Recalculated in ".round(microtime(true)-$start)."s\n";
     
@@ -207,6 +208,8 @@
         $redis->del("user:feeds:$userid");
         $redis->del("feed:lastvalue:$target");
     }
+    
+    
     
 
 
