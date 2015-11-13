@@ -30,7 +30,7 @@ A tool for checking the integrity of your emoncms phpfiwa, phpfina, phptimeserie
 
     php integritycheck.php
     
-## Covert data
+## Convert data
 
 There are two scripts for converting phpfiwa or phptimestore to phpfina. PHPFina has a much lower write load when used as the storage engine on SD Cards. Using these conversion scripts you can convert your data to PHPFina so that it can be used with the new SD Card branch of emoncms called 'bufferedwrite'
 
@@ -52,3 +52,20 @@ for example to remove value above 5.5V and below 1V (battery feed in V for examp
     sudo php remove_spike.php -i 22 -n 1 -x 5.5
 
 ONLY WORKS WITH PHPFIWA DATA!
+
+## Emoncms MYSQL backup script
+
+This shell script can be called manually, or automated by using Node-red or Cron to create a MYSQL dump of your emoncms MYSQL database.  
+Firstly, edit the mysql_backup_emoncms.sh script as follows;  
+-u 'username' = your emoncms MYSQL username (default is emoncms)  
+-p'password' = your emoncms MYSQL password (Note - there is no space after the leading 'p'!!)  
+'database' = the name of your emoncms MYSQL database (default is emoncms)  
+Replace '/path/to/' with the absolute path to where your backup will be stored
+
+Make the file executable:
+
+`chmod +x mysql_backup_emoncms.sh`
+
+To run, from the script installation directory:
+
+`./mysql_backup_emoncms.sh`
