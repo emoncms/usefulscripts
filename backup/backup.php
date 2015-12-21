@@ -22,12 +22,12 @@
     include "lib/phpfina.php";
     include "lib/inputs.php";
       
-    $remote_server = "http://emoncms.org";
+    $remote_server = "http://192.168.1.99/emoncms";
     // NEEDS TO BE YOUR WRITE APIKEY (ELEVATED PERMISSIONS FOR FULL DATA EXPORT)
-    $remote_apikey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    $remote_apikey = "000ee1d52ccf332c7d580ea1e333f7b2";
     
-    $link_to_local_emoncms = false;
-    $local_emoncms_location = "/var/www/emoncms/";
+    $link_to_local_emoncms = true;
+    $local_emoncms_location = "/var/www/heatpump/";
     $local_emoncms_userid = 1;
     $backup_inputs = false;
     
