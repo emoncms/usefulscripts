@@ -8,7 +8,7 @@ sudo tar xvfz backup.tar.gz -C /
 mysql -u root -praspberry emoncms < /home/pi/data/emoncms.sql
 
 mv /home/pi/data/emonhub.conf /home/pi/data/old.emonhub.conf
-cp /home/pi/emonhub/emonhub.conf /home/pi/data/emonhub.conf
+cp /home/pi/emonhub/conf/emonhub.conf /home/pi/data/emonhub.conf
 
 mv /home/pi/data/emoncms.conf /home/pi/data/old.emoncms.conf
 
