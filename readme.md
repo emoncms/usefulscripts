@@ -72,10 +72,22 @@ To run, from the script installation directory:
 
 ## sdpart - A script to set-up SD cards for emoncms
 
-This shell script can be run under 2 different scenarios;
-1) The script is run immediatly after installing the operating system - **BEFORE** running `$ sudo rasp-config` and expanding the filesystem. This is the preferred option!
+This shell script can be run under 2 different scenarios;  
+1) The script is run immediatly after installing the operating system - **BEFORE** running `$ sudo rasp-config` and expanding the filesystem. This is the preferred option!  
 2) If the filesystem has already been expanded, you must unmount the root partition & reduce it's size using Gparted or other similar tools, by at least 350Mb if using a 4Gb SD card, or 1.5Gb if using a larger card.
-The script will check your SD card for size and will make the following changes;
-On SD cards less than 5Gb capacity, create a 300Mb data partition formatted to ext2 with a blocksize of 1024 bytes, create a partition 'buffer' of 10Mb, and expand the root filesystem to fill the available space.
-On SD cards more than 5Gb capacity, create a 1Gb data partition formatted to ext2 with a blocksize of 1024 bytes, create a partition 'buffer' of 50Mb, and expand the root filesystem to fill the available space.
+
+
+The script will check your SD card for size and will make the following changes;  
+**On SD cards less than 5Gb capacity**  
+* create a 300Mb data partition formatted to ext2 with a blocksize of 1024 bytes  
+* create a partition 'buffer' of 10Mb  
+* expand the root filesystem to fill the available space.
+
+
+**On SD cards more than 5Gb capacity**  
+* create a 1Gb data partition formatted to ext2 with a blocksize of 1024 bytes  
+* create a partition 'buffer' of 50Mb  
+* expand the root filesystem to fill the available space.
+
+
 To run the script, navigate to the usefulscripts/sdpart folder and run `sudo ./sdpart` - following the prompts.
