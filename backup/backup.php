@@ -29,14 +29,14 @@
     $link_to_local_emoncms = true;
     $local_emoncms_location = "/var/www/emoncms/";
     $local_emoncms_userid = 1;
-    $backup_inputs = false;
+    $backup_inputs = true;
     
     // $dir and $engines only need to be set if your not linking to a local emoncms installation
     // if you are linking to a local emoncms installation, the settings will be fetched from
     // your settings.php file instead.
     
     // directory location without end /
-    $dir = "/home/user/data";
+    $dir = "/var/lib";
     
     $engines = array(    
         'phpfiwa'=>array(
