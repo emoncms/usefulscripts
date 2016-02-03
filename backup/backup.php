@@ -65,10 +65,18 @@
         
         if ($redis_enabled) {
             $redis = new Redis();
-            $redis->connect("127.0.0.1");
+            $connected = $redis->connect($redis_server['host'], $redis_server['port']);
+            if (!$connected) { echo "Can't connect to redis at ".$redis_server['host'].":".$redis_server['port']." , it may be that redis-server is not installed or started see readme for redis installation"; die; }
+            if (!empty($redis_server['prefix'])) $redis->setOption(Redis::OPT_PREFIX, $redis_server['prefix']);
+            if (!empty($redis_server['auth'])) {
+                if (!$redis->auth($redis_server['auth'])) {
+                    echo "Can't connect to redis at ".$redis_server['host'].", autentication failed"; die;
+                }
+            }
         } else {
             $redis = false;
         }
+
         $engines = $feed_settings;
         
         if ($backup_inputs) backup_inputs($mysqli,$remote_server,$remote_apikey,$local_emoncms_userid);
