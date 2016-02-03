@@ -53,23 +53,27 @@
          )
     );
 
+    $mysqli = false;
+    $redis = false;
+    
     if ($link_to_local_emoncms)
     {
         define('EMONCMS_EXEC', 1);
         chdir($local_emoncms_location);
         require "process_settings.php";
         $mysqli = @new mysqli($server,$username,$password,$database);
-        $redis = new Redis();
-        $redis->connect("127.0.0.1");
         
+        if ($redis_enabled) {
+            $redis = new Redis();
+            $redis->connect("127.0.0.1");
+        } else {
+            $redis = false;
+        }
         $engines = $feed_settings;
         
         if ($backup_inputs) backup_inputs($mysqli,$remote_server,$remote_apikey,$local_emoncms_userid);
-    } else {
-        $mysqli = false;
-        $redis = false;
     }
-
+    
     // Fetch remote server feed list
     $feeds = file_get_contents($remote_server."/feed/list.json?apikey=$remote_apikey");
     $feeds = json_decode($feeds);

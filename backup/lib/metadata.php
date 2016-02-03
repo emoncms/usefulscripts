@@ -10,16 +10,18 @@ function register_emoncms_feed($mysqli,$redis,$feed)
                
         $mysqli->query("INSERT INTO feeds (id,userid,name,tag,datatype,public,size,engine) VALUES ('".$feed->id."','".$feed->userid."','".$feed->name."','".$feed->tag."','".$feed->datatype."','".$feed->public."','".$feed->size."','".$feed->engine."')");
 
-        $redis->hMSet("feed:$feed->id",array(
-            'id'=>$feed->id,
-            'userid'=>$feed->userid,
-            'name'=>$feed->name,
-            'datatype'=>$feed->datatype,
-            'tag'=>$feed->tag,
-            'public'=>$feed->public,
-            'size'=>$feed->size,
-            'engine'=>$feed->engine
-        ));
+        if ($redis) {
+            $redis->hMSet("feed:$feed->id",array(
+                'id'=>$feed->id,
+                'userid'=>$feed->userid,
+                'name'=>$feed->name,
+                'datatype'=>$feed->datatype,
+                'tag'=>$feed->tag,
+                'public'=>$feed->public,
+                'size'=>$feed->size,
+                'engine'=>$feed->engine
+            ));
+        }
     } else {
         // echo "feed exists ".$feed->id."\n";
     }
@@ -27,6 +29,8 @@ function register_emoncms_feed($mysqli,$redis,$feed)
 
 function reload_emoncms_feeds($mysqli,$redis,$userid)
 {
+    if (!$redis) return false;
+    
     $result = $mysqli->query("SELECT id,userid,name,datatype,tag,public,size,engine FROM feeds WHERE `userid` = '$userid'");
     
     while ($row = $result->fetch_object())
