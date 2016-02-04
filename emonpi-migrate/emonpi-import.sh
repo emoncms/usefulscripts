@@ -4,8 +4,9 @@ echo "emonPi data-import script starting"
 date
 
 image_version=$(ls /boot | grep emonSD)
-# Check first 14 characters of filename
-if [[ "${image_version:0:14}" == "emonSD-17Jun2015" ]]
+# Check first 16 characters of filename
+image_date=${image_version:0:16}
+if [[ "$image_date" == "emonSD-17Jun2015" ]]
 then
   image="old"
   echo "$image image"
@@ -74,4 +75,3 @@ sudo service feedwriter start
 echo "done"
 date
 rpi-rw
-
