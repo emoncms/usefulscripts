@@ -38,7 +38,7 @@ else # if backup exists
   then
     mysql -u root -praspberry emoncms < /home/pi/data/emoncms.sql
   else
-    mysql -u root -pemonpimysql2016 emoncms < /home/pi/data/emoncms.sql
+    mysql -u emoncms -pemonpiemoncmsmysql2016 emoncms < /home/pi/data/emoncms.sql
   fi
 fi
 

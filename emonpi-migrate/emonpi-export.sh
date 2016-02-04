@@ -4,8 +4,9 @@ date=$(date +"%Y-%m-%d")
 echo $date
 
 image_version=$(ls /boot | grep emonSD)
-# Check first 14 characters of filename
-if [[ "${image_version:0:14}" == "emonSD-17Jun2015" ]]
+# Check first 16 characters of filename
+image_date=${image_version:0:16}
+if [[ "$image_date" == "emonSD-17Jun2015" ]]
 then
   image="old"
   echo "$image image"
@@ -30,7 +31,7 @@ if [[ $image == "old" ]]
 then
   mysqldump -u root -praspberry emoncms > /home/pi/data/emoncms.sql
 else
-  mysqldump -u root -pemonpimysql2016 emoncms > /home/pi/data/emoncms.sql
+  mysqldump -u emoncms -pemonpiemoncmsmysql2016 emoncms > /home/pi/data/emoncms.sql
 fi
 
 tar -cvzf backup-$date.tar.gz emoncms.sql phpfina phptimeseries emonhub.conf emoncms.conf
