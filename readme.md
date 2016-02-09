@@ -88,6 +88,26 @@ The script will check your SD card for size and will make the following changes;
 * create a 1Gb data partition formatted to ext2 with a blocksize of 1024 bytes  
 * create a partition 'buffer' of 50Mb  
 * expand the root filesystem to fill the available space.
-
+* 
 
 To run the script, navigate to the usefulscripts/sdpart folder and run `sudo ./sdpart` - following the prompts.
+
+## Password Reset 
+
+Resets Emoncms password. Run with:
+
+    php resetpassword.php
+
+It then asks for the userid (default:1) and for a new password or option to auto generate:
+
+```
+=======================================
+EMONCMS PASSWORD RESET
+=======================================
+Select userid, or press enter for default:  
+Using default user 1
+Enter new password, or press enter to auto generate:        
+Auto generated password: 9f7599c8da
+```
+[Forum thread discussion](http://openenergymonitor.org/emon/node/12155)
+Complete: new password set
