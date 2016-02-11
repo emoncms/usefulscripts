@@ -94,7 +94,9 @@ To run the script, navigate to the usefulscripts/sdpart folder and run `sudo ./s
 
 ## Password Reset 
 
-Resets Emoncms password. Run with:
+[Forum thread discussion](http://openenergymonitor.org/emon/node/12155)
+
+Reset Emoncms password. Run with:
 
     php resetpassword.php
 
@@ -109,5 +111,5 @@ Using default user 1
 Enter new password, or press enter to auto generate:        
 Auto generated password: 9f7599c8da
 ```
-[Forum thread discussion](http://openenergymonitor.org/emon/node/12155)
-Complete: new password set
+
+
