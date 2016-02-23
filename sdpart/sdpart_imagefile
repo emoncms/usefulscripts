@@ -49,7 +49,7 @@ echo ======================================================
 echo
 echo Proposed changes to be made:
 echo " SD card total disk size = "$(python -c "print $PART_END * 512.0 / 1073741824")"Gb"
-echo " Data Partition size     = "$(python -c "print ($DATA_END - $DATA_START + 1) * 512.0 / 1048576")"Mb"
+echo " Data Partition size     = "$(python -c "print ($DATA_END - $DATA_START + 1) * 512.0 / 1073741824")"Gb"
 echo
 read -r -p "Are you sure you want to proceed? [Y/n] " response
 if [[ $response =~ ^([nN][oO]|[nN])$ ]]
