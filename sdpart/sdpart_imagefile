@@ -56,6 +56,12 @@ if [[ $response =~ ^([nN][oO]|[nN])$ ]]
 then
 exit 1
 else
+# Create a test file to ensure that script is not run twice...
+cat <<\EOF > /home/pi/.sdpart_test &&
+This file serves no purpose other than to prevent
+the sdpart_imagefile script from being run more than once.
+To do so could result in the OS failing to boot.
+EOF
 # Fdisk will now to make the changes..
 umount /dev/mmcblk0
 printf "d\n3\nn\np\n3\n$DATA_START\n$DATA_END\np\nw\n" | fdisk /dev/mmcblk0
