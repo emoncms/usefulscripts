@@ -56,6 +56,7 @@ if [[ $response =~ ^([nN][oO]|[nN])$ ]]
 then
 exit 1
 else
+rpi-rw
 # Create a test file to ensure that script is not run twice...
 cat <<\EOF > /home/pi/.sdpart_test &&
 This file serves no purpose other than to prevent
@@ -90,6 +91,7 @@ case "$1" in
     resize2fs /dev/mmcblk0p3 &&
 
     # Remove the script & reboot
+    rpi-rw &&
     rm /etc/init.d/resize2fs_once &&
     update-rc.d resize2fs_once remove &&
     log_end_msg &&
