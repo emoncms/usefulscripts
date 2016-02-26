@@ -104,6 +104,8 @@ case "$1" in
     ;;
 esac
 EOF
+# Enable the resize2fs_once script & unmount mmcblk03p so the
+# filesystem can be expanded.
   chmod +x /etc/init.d/resize2fs_once &&
   update-rc.d resize2fs_once defaults &&
   sed -i 's|/dev/mmcblk0p3|#/dev/mmcblk0p3|' /etc/fstab &&
