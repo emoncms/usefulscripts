@@ -94,7 +94,7 @@ case "$1" in
     update-rc.d resize2fs_once remove &&
     log_end_msg &&
     /bin/sync &&
-    /sbin/reboot $?
+    /sbin/poweroff $?
     ;;
   *)
     echo "Usage: $0 start" >&2
