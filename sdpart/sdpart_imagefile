@@ -85,15 +85,15 @@ cat <<\EOF > /etc/init.d/resize2fs_once &&
 
 case "$1" in
   start)
-    log_daemon_msg "Starting resize2fs_once, THIS WILL TAKE A FEW MINUTES " &&
-    umount /dev/mmcblk0p3 &&
+    log_daemon_msg "Starting resize2fs_once, THIS WILL TAKE A LONG TIME!" &&
     e2fsck -fy /dev/mmcblk0p3 &&
     resize2fs /dev/mmcblk0p3 &&
 
-    # Remove the script & reboot
+    # Remove the script, mount mmcblk0p3 & poweroff
     rpi-rw &&
     rm /etc/init.d/resize2fs_once &&
     update-rc.d resize2fs_once remove &&
+    sed -i 's|#/dev/mmcblk0p3|/dev/mmcblk0p3|' /etc/fstab
     log_end_msg &&
     /bin/sync &&
     /sbin/poweroff $?
@@ -106,12 +106,15 @@ esac
 EOF
   chmod +x /etc/init.d/resize2fs_once &&
   update-rc.d resize2fs_once defaults &&
-
+  sed -i 's|/dev/mmcblk0p3|#/dev/mmcblk0p3|' /etc/fstab &&
 echo
-echo #####################################################################
-echo System is now ready to resize your system.  A REBOOT IS REQUIRED NOW!
-echo "Press ENTER to reboot : \c"
-read aok
+echo ######################################################################
+echo So far, so good... your system will now reboot and will then check and
+echo expand your /home/pi/data filesystem to fill your SD card.
+echo THIS WILL TAKE UP TO 30 MINUTES OR SO!
+echo You will know when this has been completed, because your Pi will
+echo 'poweroff' and close down.
+echo ######################################################################
 echo REBOOTING....
 /bin/sync
 /sbin/reboot
