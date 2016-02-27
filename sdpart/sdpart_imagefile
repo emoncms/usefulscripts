@@ -124,12 +124,8 @@ echo THIS WILL TAKE UP TO 30 MINUTES OR SO!
 echo You will know when this has been completed, because your Pi will
 echo 'poweroff' and close down.
 echo ######################################################################
-echo REBOOTING....
 /bin/sync
 /sbin/reboot
-echo
-echo Script Complete...
-
 fi
 ###################################################################
 # END OF SCRIPT
