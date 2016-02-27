@@ -26,9 +26,10 @@ if [ $(id -u) -ne 0 ]; then
 fi
 ###################################################################
 if [ -e /home/pi/.sdpart_test ]; then
-  printf "This script has already run once. Running it a"
-  printf "second time will damage your filesystem"
-  printf "SCRIPT EXITING"
+  echo "This script has already run once. Running it a second time"
+  echo "will damage your filesystem."
+  echo "To force the script to run again, delete the file"
+  echo "/home/pi/.sdpart_test  & rerun this script"
   exit 1
 fi
 ###################################################################
