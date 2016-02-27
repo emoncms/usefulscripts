@@ -101,7 +101,6 @@ case "$1" in
     rm /etc/init.d/resize2fs_once &&
     update-rc.d resize2fs_once remove &&
     sed -i 's|#/dev/mmcblk0p3|/dev/mmcblk0p3|' /etc/fstab &&
-    log_end_msg &&
     /bin/sync &&
     /sbin/poweroff $?
     ;;
