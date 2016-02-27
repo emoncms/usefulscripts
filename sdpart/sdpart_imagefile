@@ -102,7 +102,7 @@ case "$1" in
     update-rc.d resize2fs_once remove &&
     sed -i 's|#/dev/mmcblk0p3|/dev/mmcblk0p3|' /etc/fstab &&
     /bin/sync &&
-    /sbin/poweroff $?
+    /sbin/shutdown -h now $?
     ;;
   *)
     echo "Usage: $0 start" >&2
