@@ -25,6 +25,13 @@ if [ $(id -u) -ne 0 ]; then
   exit 1
 fi
 ###################################################################
+if [ -e /home/pi/.sdpart_test ]; then
+  printf "This script has already run once. Running it a"
+  printf "second time will damage your filesystem"
+  printf "SCRIPT EXITING"
+  exit 1
+fi
+###################################################################
 echo
 PART_END="$(($(blockdev --getsz /dev/mmcblk0)))"
 DATA_START="$(parted /dev/mmcblk0 -ms unit s p | grep "^3" | cut -f2 -d: | sed 's/[^0-9]*//g')"
@@ -86,9 +93,8 @@ cat <<\EOF > /etc/init.d/resize2fs_once &&
 case "$1" in
   start)
     log_daemon_msg "Starting resize2fs_once, THIS WILL TAKE A LONG TIME!" &&
-    e2fsck -fy /dev/mmcblk0p3 &&
+    e2fsck -f -y /dev/mmcblk0p3 &&
     resize2fs /dev/mmcblk0p3 &&
-
     # Remove the script, mount mmcblk0p3 & poweroff
     rpi-rw &&
     rm /etc/init.d/resize2fs_once &&
