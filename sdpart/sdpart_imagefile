@@ -94,7 +94,7 @@ cat <<\EOF > /etc/init.d/resize2fs_once &&
 case "$1" in
   start)
     log_daemon_msg "Starting resize2fs_once, THIS WILL TAKE A LONG TIME!" &&
-    e2fsck -f -y /dev/mmcblk0p3 &&
+    e2fsck -yf /dev/mmcblk0p3 &&
     resize2fs -f /dev/mmcblk0p3 &&
     rpi-rw &&
     rm /etc/init.d/resize2fs_once &&
