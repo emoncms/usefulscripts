@@ -65,7 +65,7 @@ Description=Resize2fs_once Service
 
 [Service]
 Type=idle
-ExecStart=/home/pi/resize2fs_once.sh > /home/pi/resize2fs_once.log 2>&1
+ExecStart=/home/pi/resize2fs_once.sh
 StandardOutput=null
 TimeoutStartSec=infinity
 
