@@ -93,6 +93,7 @@ cat <<\EOF > /home/pi/resize2fs_once.sh &&
     rpi-rw
     rm /lib/systemd/system/resize2fs_once.service
     systemctl disable resize2fs_once.service
+    rm /home/pi/resize2fs_once.sh
     /bin/sync
     /sbin/shutdown -h now
     
