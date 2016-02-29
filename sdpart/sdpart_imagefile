@@ -65,6 +65,24 @@ then
 exit 1
 else
 rpi-rw
+# Create a systemd unit file to extend filesystem after a reboot
+cat <<\EOF > /lib/systemd/system/resize2fs_once.service &&
+[Unit]
+Description=Resize2fs_once Service
+
+[Service]
+Type=idle
+ExecStart=/home/pi/resize2fs_once.sh > /home/pi/resize2fs_once.log 2>&1
+StandardOutput=null
+TimeoutStartSec=infinity
+
+[Install]
+WantedBy=multi-user.target
+Alias=resize2fs_once.service
+
+EOF
+systemctl enable resize2fs_once.service
+#
 # Create a test file to ensure that script is not run twice...
 cat <<\EOF > /home/pi/.sdpart_test &&
 This file serves no purpose other than to prevent
@@ -76,28 +94,14 @@ umount /dev/mmcblk0
 printf "d\n3\nn\np\n3\n$DATA_START\n$DATA_END\np\nw\n" | fdisk /dev/mmcblk0
 echo
 echo Setting up init.d resize2fs_once script
-
-cat <<\EOF > /etc/init.d/resize2fs_once &&
+# Create a script to resize the filesystem
+cat <<\EOF > /home/pi/resize2fs_once.sh &&
 #!/bin/sh
-### BEGIN INIT INFO
-# Provides: resize2fs_once
-# Required-Start:
-# Required-Stop:
-# Default-Start: 2 3 4 5
-# Default-Stop: 0 1 6
-# Short-Description: Run resize2fs_once on boot
-# Description:
-### END INIT INFO
-
-. /lib/lsb/init-functions
-
-case "$1" in
-  start)
-    log_daemon_msg "Starting resize2fs_once, THIS WILL TAKE A LONG TIME!" &&
-    e2fsck -yf /dev/mmcblk0p3 &&
-    resize2fs -f /dev/mmcblk0p3 &&
-    rpi-rw &&
-    rm /etc/init.d/resize2fs_once &&
+    log_daemon_msg "Starting resize2fs_once, THIS WILL TAKE A LONG TIME!"
+    e2fsck -yf /dev/mmcblk0p3
+    resize2fs -f /dev/mmcblk0p3
+    rpi-rw
+    rm /etc/init.d/resize2fs_once
     update-rc.d resize2fs_once remove &&
     sed -i 's|#/dev/mmcblk0p3|/dev/mmcblk0p3|' /etc/fstab &&
     /bin/sync &&
