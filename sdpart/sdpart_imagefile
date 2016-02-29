@@ -99,7 +99,7 @@ cat <<\EOF > /home/pi/resize2fs_once.sh &&
 EOF
 ###################################################################
 # Make the resize2fs_once script executable
-chmod +x /home/pi/resize2fs_once
+chmod +x /home/pi/resize2fs_once.sh
 echo
 echo ######################################################################
 echo So far, so good... your system will now reboot and will then check and
