@@ -25,14 +25,6 @@ if [ $(id -u) -ne 0 ]; then
   exit 1
 fi
 ###################################################################
-if [ -e /home/pi/.sdpart_test ]; then
-  echo "This script has already run once. Running it a second time"
-  echo "will damage your filesystem."
-  echo "To force the script to run again, delete the file"
-  echo "/home/pi/.sdpart_test  & rerun this script"
-  exit 1
-fi
-###################################################################
 echo
 PART_END="$(($(blockdev --getsz /dev/mmcblk0)))"
 DATA_START="$(parted /dev/mmcblk0 -ms unit s p | grep "^3" | cut -f2 -d: | sed 's/[^0-9]*//g')"
@@ -65,6 +57,7 @@ then
 exit 1
 else
 rpi-rw
+###################################################################
 # Create a systemd unit file to extend filesystem after a reboot
 cat <<\EOF > /lib/systemd/system/resize2fs_once.service &&
 [Unit]
@@ -81,48 +74,38 @@ WantedBy=multi-user.target
 Alias=resize2fs_once.service
 
 EOF
+###################################################################
+# Enable the unit file so it runs after a reboot
 systemctl enable resize2fs_once.service
 #
-# Create a test file to ensure that script is not run twice...
-cat <<\EOF > /home/pi/.sdpart_test &&
-This file serves no purpose other than to prevent
-the sdpart_imagefile script from being run more than once.
-To do so could result in the OS failing to boot.
-EOF
-# Fdisk will now to make the changes..
-umount /dev/mmcblk0
+# Fdisk will now make the changes..
+umount /dev/mmcblk0p3
 printf "d\n3\nn\np\n3\n$DATA_START\n$DATA_END\np\nw\n" | fdisk /dev/mmcblk0
 echo
-echo Setting up init.d resize2fs_once script
-# Create a script to resize the filesystem
+###################################################################
+echo Setting up a resize2fs_once script
 cat <<\EOF > /home/pi/resize2fs_once.sh &&
 #!/bin/sh
+    umount /dev/mmcblk0p3
     log_daemon_msg "Starting resize2fs_once, THIS WILL TAKE A LONG TIME!"
     e2fsck -yf /dev/mmcblk0p3
     resize2fs -f /dev/mmcblk0p3
     rpi-rw
-    rm /etc/init.d/resize2fs_once
-    update-rc.d resize2fs_once remove &&
-    sed -i 's|#/dev/mmcblk0p3|/dev/mmcblk0p3|' /etc/fstab &&
-    /bin/sync &&
-    /sbin/shutdown -h now $?
-    ;;
-  *)
-    echo "Usage: $0 start" >&2
-    exit 3
-    ;;
-esac
+    rm /lib/systemd/system/resize2fs_once.service
+    systemctl disable resize2fs_once.service
+    /bin/sync
+    /sbin/shutdown -h now
+    
 EOF
+###################################################################
 # Enable the resize2fs_once script & unmount mmcblk03p so the
 # filesystem can be expanded.
-  chmod +x /etc/init.d/resize2fs_once &&
-  update-rc.d resize2fs_once defaults &&
-  sed -i 's|/dev/mmcblk0p3|#/dev/mmcblk0p3|' /etc/fstab &&
+chmod +x /home/pi/resize2fs_once
 echo
 echo ######################################################################
 echo So far, so good... your system will now reboot and will then check and
 echo expand your /home/pi/data filesystem to fill your SD card.
-echo THIS WILL TAKE UP TO 30 MINUTES OR SO!
+echo THIS WILL TAKE UP TO 10 MINUTES OR SO!
 echo You will know when this has been completed, because your Pi will
 echo 'poweroff' and close down.
 echo ######################################################################
