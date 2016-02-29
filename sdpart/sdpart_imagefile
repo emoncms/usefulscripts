@@ -86,8 +86,8 @@ echo
 echo Setting up a resize2fs_once script
 cat <<\EOF > /home/pi/resize2fs_once.sh &&
 #!/bin/sh
+    log_daemon_msg "Starting resize2fs_once script"
     umount /dev/mmcblk0p3
-    log_daemon_msg "Starting resize2fs_once, THIS WILL TAKE A LONG TIME!"
     e2fsck -yf /dev/mmcblk0p3
     resize2fs -f /dev/mmcblk0p3
     rpi-rw
@@ -98,8 +98,7 @@ cat <<\EOF > /home/pi/resize2fs_once.sh &&
     
 EOF
 ###################################################################
-# Enable the resize2fs_once script & unmount mmcblk03p so the
-# filesystem can be expanded.
+# Make the resize2fs_once script executable
 chmod +x /home/pi/resize2fs_once
 echo
 echo ######################################################################
