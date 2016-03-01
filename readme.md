@@ -72,6 +72,12 @@ To run, from the script installation directory:
 
 ## sdpart - A script to set-up SD cards for emoncms
 
+There are two variants of this script; sdpart_imagefile and sdpart_selfbuild.  
+**sdpart_selfbuild** is a script intended to be used to prepare a SD card for users wishing to build their system step-by-step using the emoncms self-build guides.
+**sdpart_imagefile** is a script to be used **only** with the official emoncms imagefile, which will make the necessary changes to your SD card for emoncms to run effectively.
+
+####sdpart_selfbuild
+
 This shell script can be run under 2 different scenarios;  
 1) The script is run immediatly after installing the operating system - **BEFORE** running `$ sudo rasp-config` and expanding the filesystem. This is the preferred option!  
 2) If the filesystem has already been expanded, you must unmount the root partition & reduce it's size using Gparted or other similar tools, by at least 350Mb if using a 4Gb SD card, or 1.5Gb if using a larger card.
@@ -88,9 +94,19 @@ The script will check your SD card for size and will make the following changes;
 * create a 1Gb data partition formatted to ext2 with a blocksize of 1024 bytes  
 * create a partition 'buffer' of 50Mb  
 * expand the root filesystem to fill the available space.
-* 
 
-To run the script, navigate to the usefulscripts/sdpart folder and run `sudo ./sdpart` - following the prompts.
+To run the script, navigate to the usefulscripts/sdpart folder and run `sudo ./sdpart_selfbuild` - following the prompts.
+
+####sdpart_imagefile
+
+Firstly, write the emoncms imagefile to your SD card, and boot emoncms in your Raspberry Pi.  
+**Do not run raspi-config** but run the sdpart_imagefile script as follows;  
+
+`sudo /home/pi/usefulscripts/sdpart/./sdpart_imagefile` - following the prompts.  
+
+The script will determine, and make the necessary changes, but will take 20 minutes or so to complete, and it's important that the process is not interupted.  
+So leave well alone! and once complete, your Raspberry Pi will poweroff and shutdown.
+
 
 ## Password Reset 
 
