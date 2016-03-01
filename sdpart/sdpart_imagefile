@@ -6,12 +6,10 @@
 #  Emoncms - open source energy visualisation
 #  Part of the OpenEnergyMonitor project: http://openenergymonitor.org
 ###################################################################
-# This script is intended to prepare SD card partitioning as follows;
-# * Calculate partitioning to accomodate a Data partition
-# * Create a data partition
-# * Expand the root partition to a preset size
-# * Install a suitable file system to the data partition
-# * Expand the root filesystem
+# This script's purpose is to prepare a SD Card after a emoncms imagefile
+# has been written to a SD card.
+# It will calculate and expand the preferred /data partition size, and
+# then also expand the partition filesystem.
 #
 # Author:    Paul Reed
 # Credits:   Kevin Reed (Dweeber)
@@ -105,9 +103,11 @@ echo
 echo ######################################################################
 echo So far, so good... your system will now reboot and will then check and
 echo expand your /home/pi/data filesystem to fill your SD card.
-echo THIS WILL TAKE UP TO 10 MINUTES OR SO!
+echo THIS WILL TAKE UP TO 20 MINUTES OR SO!
 echo You will know when this has been completed, because your Pi will
 echo 'poweroff' and close down.
+echo PLEASE! don't be tempted to interfere with this process, because
+echo it will likely result in a unusable filesystem!!
 echo ######################################################################
 /bin/sync
 /sbin/reboot
