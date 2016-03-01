@@ -8,15 +8,13 @@
 ###################################################################
 # This script's purpose is to prepare a SD Card after a emoncms imagefile
 # has been written to a SD card.
-# It will calculate and expand the preferred /data partition size, and
-# then also expand the partition filesystem.
+# It will calculate and expand the /data partition to the preferred size,
+# and then also expand the partition filesystem.
+# The whole process takes about 20 minutes to complete, depending upon the
+# size of the SD card, and its important that the script is not interupted.
+# Upon completion, your Raspberry Pi will poweroff.
 #
 # Author:    Paul Reed
-# Credits:   Kevin Reed (Dweeber)
-#            jojopi on Raspberry Pi Forum who provided sample code
-#            MrEngman on Raspberry Pi Forum for testing
-#            Examples from http://github.com/asb/raspi-config
-#
 ###################################################################
 if [ $(id -u) -ne 0 ]; then
   printf "Script must be run as root. Try 'sudo ./sdpart'\n"
