@@ -80,7 +80,6 @@ EOF
 systemctl enable resize2fs_once.service
 #
 # Fdisk will now make the changes..
-umount /dev/mmcblk0p3
 printf "d\n3\nn\np\n3\n$DATA_START\n$DATA_END\np\nw\n" | fdisk /dev/mmcblk0
 echo
 ###################################################################
@@ -95,6 +94,7 @@ cat <<\EOF > /home/pi/resize2fs_once.sh &&
     rm /lib/systemd/system/resize2fs_once.service
     systemctl disable resize2fs_once.service
     rm /home/pi/resize2fs_once.sh
+    sed -i 's/#\/dev\/mmcblk0p3/\/dev\/mmcblk0p3/' /etc/fstab
     /bin/sync
     /sbin/shutdown -h now
     
@@ -102,6 +102,8 @@ EOF
 ###################################################################
 # Make the resize2fs_once script executable
 chmod +x /home/pi/resize2fs_once.sh
+# Ensure that the /data partition is unmounted after a reboot
+sed -i 's/\/dev\/mmcblk0p3/#\/dev\/mmcblk0p3/' /etc/fstab
 echo
 echo
 echo ======================================================================
