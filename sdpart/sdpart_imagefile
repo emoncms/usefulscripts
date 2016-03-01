@@ -103,11 +103,11 @@ echo
 echo ######################################################################
 echo So far, so good... your system will now reboot and will then check and
 echo expand your /home/pi/data filesystem to fill your SD card.
-echo THIS WILL TAKE UP TO 20 MINUTES OR SO!
+echo THIS WILL TAKE UP TO 20 MINUTES OR SO
 echo You will know when this has been completed, because your Pi will
-echo 'poweroff' and close down.
-echo PLEASE! don't be tempted to interfere with this process, because
-echo it will likely result in a unusable filesystem!!
+echo poweroff and close down.
+echo PLEASE don't be tempted to interfere with this process, because
+echo it will likely result in a unusable filesystem.
 echo ######################################################################
 /bin/sync
 /sbin/reboot
