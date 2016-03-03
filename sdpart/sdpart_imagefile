@@ -81,6 +81,9 @@ systemctl enable resize2fs_once.service
 #
 # Fdisk will now make the changes..
 printf "d\n3\nn\np\n3\n$DATA_START\n$DATA_END\np\nw\n" | fdisk /dev/mmcblk0
+echo This error message can however be disregarded, because your system
+echo is about to be rebooted, and the new partition table will then be
+echo read by your operating system.
 echo
 ###################################################################
 echo Writing the resize2fs_once script
