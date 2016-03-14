@@ -102,7 +102,12 @@ To run the script, navigate to the usefulscripts/sdpart folder and run `sudo ./s
 Firstly, write the emoncms imagefile to your SD card, and boot emoncms in your Raspberry Pi.  
 **Do not run raspi-config** but run the sdpart_imagefile script as follows;  
 
-`sudo /home/pi/usefulscripts/sdpart/./sdpart_imagefile` - following the prompts.  
+```
+rpi-rw 
+cd usefulscripts
+git pull
+sudo sdpart/./sdpart_imagefile
+```
 
 The script will determine, and make the necessary changes, but will take 20 minutes or so to complete, and it's important that the process is not interupted.  
 So leave well alone! and once complete, your Raspberry Pi will poweroff and shutdown.
