@@ -37,7 +37,10 @@ There are two scripts for converting phpfiwa or phptimestore to phpfina. PHPFina
     phpfiwa_to_phpfina.php
     phptimestore_to_phpfina.php
     
-Set the source and target directory as well as emoncms install location and then run as above.
+Set the source and target directory as well as emoncms install location and then run as above.  
+Once the script has completed the conversion, flush redis for the changes to take effect;
+
+`redis-cli flushall`
 
 ## Remove spikes
 
