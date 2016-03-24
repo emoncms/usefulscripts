@@ -17,7 +17,10 @@ if ( $mysqli->connect_error ) {
 }
 
 $userid = (int)stdin("Select userid, or press enter for default: ");
-if ($userid==0) echo "Using default user 1\n";
+if ($userid==0) {
+    echo "Using default user 1\n";
+    $userid = 1;
+}
 
 $newpass = stdin("Enter new password, or press enter to auto generate: ");
 if ($newpass=="") {
