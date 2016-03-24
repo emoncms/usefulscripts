@@ -7,6 +7,8 @@ define('EMONCMS_EXEC', 1);
 chdir("/var/www/emoncms");
 require "process_settings.php";
 
+$old = false;
+
 $mysqli = @new mysqli($server,$username,$password,$database);
 if ( $mysqli->connect_error ) {
     echo "Can't connect to database, please verify credentials/configuration in settings.php<br />";
@@ -15,6 +17,9 @@ if ( $mysqli->connect_error ) {
     }
     die();
 }
+
+$v9 = (int)stdin("Are you running emoncms v9? (y/n): ");
+if ($v9=="n") $old = true;
 
 $userid = (int)stdin("Select userid, or press enter for default: ");
 if ($userid==0) {
@@ -33,6 +38,7 @@ if ($newpass=="") {
 // Hash and salt
 $hash = hash('sha256', $newpass);
 $salt = md5(uniqid(rand(), true));
+if ($old) $salt = substr($salt, 0, 3);
 $password = hash('sha256', $salt . $hash);
 
 // Save password and salt
