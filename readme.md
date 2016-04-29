@@ -111,6 +111,9 @@ cd usefulscripts
 git pull
 sudo sdpart/./sdpart_imagefile
 ```
+Symlink to use `sudo emonSDexpand` with:
+
+`sudo ln -s /home/pi/usefulscripts/sdpart/sdpart_imagefile /sbin/emonSDexpand`
 
 The script will determine, and make the necessary changes, but will take 20 minutes or so to complete, and it's important that the process is not interupted.  
 So leave well alone! and once complete, your Raspberry Pi will poweroff and shutdown.
