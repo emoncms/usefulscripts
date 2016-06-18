@@ -209,10 +209,6 @@
         $redis->del("feed:lastvalue:$target");
     }
     
-    
-    
-
-
     function stdin($prompt = null){
         if($prompt){
             echo $prompt;

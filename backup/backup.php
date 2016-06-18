@@ -24,7 +24,7 @@
       
     $remote_server = "http://emoncms.org";
     // NEEDS TO BE YOUR WRITE APIKEY (ELEVATED PERMISSIONS FOR FULL DATA EXPORT)
-    $remote_apikey = "WRITE-APIKEY";
+    $remote_apikey = "34cb094b4b27dcc0d35245c2f46a75c1";
     
     $link_to_local_emoncms = true;
     $local_emoncms_location = "/var/www/emoncms/";
