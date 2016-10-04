@@ -113,7 +113,7 @@ echo
 echo ======================================================================
 echo
 echo So far, so good... in 20s your system will reboot 
-echo and resize the `/home/pi/data` filesystem to fill the resized partition.
+echo and resize the /home/pi/data filesystem to fill the resized partition.
 echo **THIS OPPERATION WILL TAKE UP TO 20 MINUTES**
 echo When completed the Pi will poweroff and close down.
 echo PLEASE DO NOT UNPLUG THE POWER FOR AT LEAEST 30min
