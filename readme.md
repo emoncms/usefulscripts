@@ -2,9 +2,13 @@
 
 Useful scripts for managing your emoncms installation.
 
+## Update Emoncms
+
+`update_emoncms.sh` script can be used to update Emoncms, this script pulls the latest chages from Emoncms GitHub and Emoncms Modules repos. The script assumes Emoncms path `/var/www/html/emoncms` edit to match your setup. Contribuited by @pb66 (Paul) [see forum thread](https://community.openenergymonitor.org/t/emoncms-9-8-3-released-to-emonpi-stable-branch/3759/6).
+
 ## Backup/Replication
 
-This is a tool for backing up the data in an emoncms.org account or other remote emoncms server to a local computer. It can be used with or without a local installation of emoncms. To use, open Backup/backup.php in a text editor. 
+This is a tool for backing up the data in an emoncms.org account or other remote emoncms server to a local computer. It can be used with or without a local installation of emoncms. To use, open Backup/backup.php in a text editor.
 
 - Set $remote_server and $remote_apikey to correspond to the remote emoncms account you wish to download from.
 - Set $link\_to\_local\_emoncms to true if you wish to access your data within a local installation of emoncms. Set $local\_emoncms\_location and $local\_emoncms\_userid to link to your local emoncms installation.
@@ -23,20 +27,20 @@ If backing up feed data via the normal directory copy method fails due to a disk
 To use the data recovery tool, open recover.php and set both source and target directories for the data to recover. Run the recover tool from terminal with:
 
     php recover.php
-    
+
 ## Integrity check
 
 A tool for checking the integrity of your emoncms phpfiwa, phpfina, phptimeseries and phptimestore feeds. To use, open recover.php and set the engine data directories. Run the recover tool from terminal with:
 
     php integritycheck.php
-    
+
 ## Convert data
 
 There are two scripts for converting phpfiwa or phptimestore to phpfina. PHPFina has a much lower write load when used as the storage engine on SD Cards. Using these conversion scripts you can convert your data to PHPFina so that it can be used with the new SD Card branch of emoncms called 'bufferedwrite'
 
     phpfiwa_to_phpfina.php
     phptimestore_to_phpfina.php
-    
+
 Set the source and target directory as well as emoncms install location and then run as above.  
 Once the script has completed the conversion, flush redis for the changes to take effect;
 
@@ -49,7 +53,7 @@ This script is useful to remove irregularities in feed data, and works through t
 To run the script;
 
     sudo php remove_spike.php -i FeedId -n MinValue -x MaxValue
-    
+
 for example to remove value above 5.5V and below 1V (battery feed in V for example) on feed 22 the syntax is;
 
     sudo php remove_spike.php -i 22 -n 1 -x 5.5
@@ -106,7 +110,7 @@ Firstly, write the emoncms imagefile to your SD card, and boot emoncms in your R
 **Do not run raspi-config** but run the sdpart_imagefile script as follows;  
 
 ```
-rpi-rw 
+rpi-rw
 cd usefulscripts
 git pull
 sudo sdpart/./sdpart_imagefile
@@ -119,7 +123,7 @@ The script will determine, and make the necessary changes, but will take 20 minu
 So leave well alone! and once complete, your Raspberry Pi will poweroff and shutdown.
 
 
-## Password Reset 
+## Password Reset
 
 [Forum thread discussion](http://openenergymonitor.org/emon/node/12155)
 
@@ -138,5 +142,3 @@ Using default user 1
 Enter new password, or press enter to auto generate:        
 Auto generated password: 9f7599c8da
 ```
-
-
