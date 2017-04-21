@@ -211,7 +211,7 @@
     
     // force a reload of the feeds table
     if ($redis && $redis->exists("user:feeds:$userid")) {
-        // $redis->del("user:feeds:$userid");
+        $redis->del("feed:$target");
         $redis->del("feed:lastvalue:$target");
         
     }
