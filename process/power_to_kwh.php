@@ -34,9 +34,13 @@
 
     if (class_exists('Redis') && $redis_enabled) {
         $redis = new Redis();
-        $connected = $redis->connect("127.0.0.1");
-        if (!$connected) {
-            echo "Can't connect to redis database, it may be that redis-server is not installed or started see readme for redis installation"; die;
+        $connected = $redis->connect($redis_server['host'], $redis_server['port']);
+        if (!$connected) { echo "Can't connect to redis at ".$redis_server['host'].":".$redis_server['port']." , it may be that redis-server is not installed or started see readme for redis installation"; die; }
+        if (!empty($redis_server['prefix'])) $redis->setOption(Redis::OPT_PREFIX, $redis_server['prefix']);
+        if (!empty($redis_server['auth'])) {
+            if (!$redis->auth($redis_server['auth'])) {
+                echo "Can't connect to redis at ".$redis_server['host'].", autentication failed"; die;
+            }
         }
     } else {
         $redis = false;
@@ -207,8 +211,9 @@
     
     // force a reload of the feeds table
     if ($redis && $redis->exists("user:feeds:$userid")) {
-        $redis->del("user:feeds:$userid");
+        // $redis->del("user:feeds:$userid");
         $redis->del("feed:lastvalue:$target");
+        
     }
     
     function stdin($prompt = null){
