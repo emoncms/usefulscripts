@@ -122,22 +122,24 @@
     if ($source_engine==6) $interval = $sourcemeta->interval[0];
     echo "Output interval: ".$interval."s\n";
     
-    echo "Would you like to modify the kwh feed interval to be longer than the interval above?\n";
-    echo "This will reduce disk space use\n";
-    
-    $modinterval = (int) stdin(":");
-    
-    if ($modinterval>$interval) {
-        if ($modinterval%10!=0) {
-            echo "ERROR: interval given needs to be a multiple of 10, using source interval\n";
-        } else {
-            $interval = $modinterval;
+    if (stdin("Would you like to modify the kwh feed interval to be longer than the interval above? (y/n):")=="y") {
+        
+        $modinterval = (int) stdin("Please enter interval (e.g 30):");
+
+        if ($modinterval>$interval) {
+            if ($modinterval%10!=0) {
+                echo "ERROR: interval given needs to be a multiple of 10, using source interval\n";
+            } else {
+                $interval = $modinterval;
+            }
         }
     }
     
-    echo "\n Would you like to remove erroneous high power spikes?\n"; 
-    $maxpowerlevel = (int)stdin("set max power level to accept here:");
-    
+    $maxpowerlevel = false;
+    if (stdin("Would you like to remove erroneous high power spikes? (y/n):")=="y") {; 
+        $maxpowerlevel = (int)stdin("set max power level to accept (e.g 24000):");
+    }
+
     $engine[Engine::PHPFINA]->delete($target);
     $engine[Engine::PHPFINA]->create($target,array("interval"=>$interval));
     
@@ -158,7 +160,7 @@
             
             $power = $dp['value'];
             
-            if ($power<$maxpowerlevel) {
+            if ($maxpowerlevel===false || $power<$maxpowerlevel) {
 
                 $last_time = $time;
                 $time = $dp['time'];
