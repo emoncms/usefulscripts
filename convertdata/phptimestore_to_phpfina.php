@@ -62,14 +62,14 @@ if ($redis_enabled) {
     $redis = false;
 }
 
-// Either use default phpfiwa and phpfina data directories
+// Either use default phpfina data directories
 // or use user specified directory from emoncms/settings.php
-$sourcedir = "/var/lib/phpfiwa/";
-if (isset($feed_settings["phpfiwa"])) $sourcedir = $feed_settings["phpfiwa"]["datadir"];
+$sourcedir = "/var/lib/phpfina/";
+if (isset($feed_settings["phpfina"])) $sourcedir = $feed_settings["phpfina"]["datadir"];
 $targetdir = "/var/lib/timestore/";
 if (isset($feed_settings["timestore"])) $targetdir = $feed_settings["timestore"]["datadir"];
 
-// Find all PHPFiwa feeds
+// Find all PHPTimestore feeds
 $result = $mysqli->query("SELECT * FROM feeds WHERE `engine`=4");
 
 // Quick check at this point so that conversion can be aborted
@@ -84,7 +84,7 @@ $line = fgets($handle);
 if(trim($line) != 'y') exit;
 
 $phptimestorefeeds = array();
-// For each PHPFIWA feed
+// For each PHPFINA feed
 while($row = $result->fetch_array())
 {
     print $row['id']." ".$row['name']."\n";
