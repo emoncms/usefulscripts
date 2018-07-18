@@ -48,7 +48,7 @@ Once the script has completed the conversion, flush redis for the changes to tak
 
 ## Remove spikes
 
-This script is useful to remove irregularities in feed data, and works through the phpfiwa data files searching for values that are larger or smaller than the limits, when it find one it sets it to NAN which means its ignored in the graph.
+This script is useful to remove irregularities in feed data, and works through the phpfiwa data files searching for values that are larger or smaller than the limits, when it finds one it sets it to NAN which means its ignored in the graph.
 
 To run the script;
 
@@ -142,3 +142,16 @@ Using default user 1
 Enter new password, or press enter to auto generate:        
 Auto generated password: 9f7599c8da
 ```
+
+## Create users and devices, add the users to a group
+
+Script for bulk creation of users. If device module is installed it can create one device for the user. If group module is installed it can add the user to a group as a passive member.
+
+The script outputs a csv table including: username, userid, password, apikey_read, apikey_write, device_key. This table can be copied and pasted into a csv file for importing into a spreadsheet.
+ 
+`php create_users_and_devices_add_to_group.php -d device_template -g group_name --dnode device_id --dname device_name -u username1 -u username2`
+
+To get some basic help:
+
+`php create_users_and_devices_add_to_group.php -h`
+
