@@ -98,21 +98,21 @@ cat <<\EOF > /home/pi/resize2fs_once.sh &&
     rm /lib/systemd/system/resize2fs_once.service
     systemctl disable resize2fs_once.service
     rm /home/pi/resize2fs_once.sh
-    sed -i 's/#\/dev\/mmcblk0p3/\/dev\/mmcblk0p3/' /etc/fstab
+    sed -i 's/^#\(.*\/home\/pi\/data\)/\1/' /etc/fstab
     /bin/sync
     /sbin/shutdown -h now
-    
+
 EOF
 ###################################################################
 # Make the resize2fs_once script executable
 chmod +x /home/pi/resize2fs_once.sh
 # Ensure that the /data partition is unmounted after a reboot
-sed -i 's/\/dev\/mmcblk0p3/#\/dev\/mmcblk0p3/' /etc/fstab
+sed -i 's/^\([^#].*\/home\/pi\/data\)/#\1/' /etc/fstab
 echo
 echo
 echo ======================================================================
 echo
-echo So far, so good... in 20s your system will reboot 
+echo So far, so good... in 20s your system will reboot
 echo and resize the /home/pi/data filesystem to fill the resized partition.
 echo **THIS OPERATION WILL TAKE UP TO 20 MINUTES**
 echo When completed the Pi will poweroff and close down.
