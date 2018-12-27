@@ -9,5 +9,7 @@ for M in $EMONCMS_DIR/Modules/*
     if [ -d "$M/.git" ]; then
       printf "\nUpdate emoncms/$(basename $M)....\n"
       git -C $M pull
+      git -C $M status
+      git -C $M describe --tags
     fi
   done
