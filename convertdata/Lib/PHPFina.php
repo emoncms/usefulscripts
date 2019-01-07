@@ -80,12 +80,14 @@ class PHPFina
      * @param integer $feedid The id of the feed to add to
      * @param integer $time The unix timestamp of the data point, in seconds
      * @param float $value The value of the data point
+     * @param boolean $checkrange Whether or not to check if the timestamp is within range
     */
-    public function prepare($id,$timestamp,$value)
+    public function prepare($id,$timestamp,$value,$checkrange=true)
     {   
         $id = (int) $id;
         $timestamp = (int) $timestamp;
         $value = (float) $value;
+        $checkrange = (bool) $checkrange;
         
         $filename = "".$id;
         
@@ -93,7 +95,7 @@ class PHPFina
         $start = $now-(3600*24*365*5); // 5 years in past
         $end = $now+(3600*48);         // 48 hours in future
         
-        if ($timestamp<$start || $timestamp>$end) {
+        if ($checkrange && ($timestamp<$start || $timestamp>$end)) {
             $this->log->warn("PHPFina:post timestamp out of range");
             return false;
         }
