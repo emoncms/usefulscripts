@@ -17,10 +17,11 @@
 #! /bin/sh
 
 USER=pi
+HOMEDIR=/home/pi
 
 sudo apt-get update -y
-sudo apt-get upgrade -y
-# sudo apt-get -y dist-upgrade
+# sudo apt-get upgrade -y
+sudo apt-get -y dist-upgrade
 sudo apt-get clean
 
 # Needed on stock raspbian lite 19th March 2019
@@ -28,7 +29,7 @@ sudo apt --fix-broken install
 
 # Emoncms install process from:
 # https://github.com/emoncms/emoncms/blob/master/docs/RaspberryPi/readme.md
-sudo apt-get install -y apache2 mariadb-server mysql-client php7.0 libapache2-mod-php7.0 php7.0-mysql php7.0-gd php7.0-opcache php7.0-curl php-pear php7.0-dev php7.0-mcrypt php7.0-common redis-server git build-essential php7.0-mbstring libmosquitto-dev mosquitto python-pip python-dev gettext
+sudo apt-get install -y apache2 mariadb-server mysql-client php7.0 libapache2-mod-php7.0 php7.0-mysql php7.0-gd php7.0-opcache php7.0-curl php-pear php7.0-dev php7.0-mcrypt php7.0-common redis-server git build-essential php7.0-mbstring libmosquitto-dev mosquitto python-pip python-dev gettext ufw
 
 # Install the pecl dependencies
 sudo pecl channel-update pecl.php.net
@@ -54,10 +55,20 @@ sudo phpenmod mosquitto
 #     default: emonpimqtt2016
 
 # Enable apache mod rewrite
-# MANUAL FIX for mod rewrite in /etc/apache2/apache2.conf
-# For <Directory /> and <Directory /var/www/> change AllowOverride None to AllowOverride All. 
-# This should be on, or very close to lines 161 and 172 of /etc/apache2/apache2.conf
 sudo a2enmod rewrite
+cat <<EOF >> $HOMEDIR/emoncms.conf
+<Directory /var/www/html/emoncms>
+    Options FollowSymLinks
+    AllowOverride All
+    DirectoryIndex index.php
+    Order allow,deny
+    Allow from all
+</Directory>
+EOF
+sudo mv $HOMEDIR/emoncms.conf /etc/apache2/sites-available/emoncms.conf
+# Review is this line needed? if so check for existing entry
+# printf "ServerName localhost" | sudo tee -a /etc/apache2/apache2.conf 1>&2
+sudo a2ensite emoncms
 sudo service apache2 restart
 
 # Emoncms install
@@ -201,10 +212,6 @@ printf $hostname | sudo tee /etc/hostname > /dev/null
 # --------------------------------------------------------------------------------
 # Manual steps to complete
 # --------------------------------------------------------------------------------
-
-# MANUAL FIX for mod rewrite in /etc/apache2/apache2.conf
-# For <Directory /> and <Directory /var/www/> change AllowOverride None to AllowOverride All. 
-# This should be on, or very close to lines 161 and 172 of /etc/apache2/apache2.conf
 
 # Disable redis persistance
 #   sudo nano /etc/redis/redis.conf
