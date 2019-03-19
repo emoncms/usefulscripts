@@ -172,6 +172,8 @@ sudo touch /boot/emonSD-30Oct18
 #   sudo nano /boot/cmdline.txt
 #   remove: console=serial0,115200
 
+# Change emonhub logging level to WARNING
+
 sudo reboot
 
 # --------------------------------------------------------------------------------
