@@ -185,6 +185,10 @@ rm -r log2ram-master
 
 # Change emonhub logging level to WARNING
 
+# Disable duplicate daemon.log logging to syslog
+# sudo nano /etc/rsyslog.conf
+# change syslog line to: *.*;auth,authpriv.none,daemon.none      -/var/log/syslog
+
 sudo reboot
 
 # --------------------------------------------------------------------------------
