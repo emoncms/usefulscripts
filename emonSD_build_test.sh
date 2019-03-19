@@ -37,6 +37,13 @@ sudo phpenmod mosquitto
 # Disable mosquitto persistance
 #   sudo nano mosquitto.conf
 #   Set persistence false
+#   Add lines:
+#     allow_anonymous false
+#     password_file /etc/mosquitto/passwd
+#     log_type error
+#   Create password file
+#     sudo mosquitto_passwd -c /etc/mosquitto/passwd emonpi
+#     default: emonpimqtt2016
 
 # Enable apache mod rewrite
 # MANUAL FIX for mod rewrite in /etc/apache2/apache2.conf
@@ -205,6 +212,14 @@ git clone https://github.com/openenergymonitor/avrdude-rpi.git ~/avrdude-rpi && 
 # Disable mosquitto logging (cant seem to set log level to error?)
 # sudo nano /etc/mosquitto/mosquitto.conf
 # change: log_dest none
+#   Set persistence false
+#   Add lines:
+#     allow_anonymous false
+#     password_file /etc/mosquitto/passwd
+#     log_type error
+#   Create password file
+#     sudo mosquitto_passwd -c /etc/mosquitto/passwd emonpi
+#     default: emonpimqtt2016
 
 # Memory Tweak
 # Append gpu_mem=16 to /boot/config.txt this caps the RAM available to the GPU. 
