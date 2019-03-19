@@ -148,6 +148,10 @@ sudo touch /boot/emonSD-30Oct18
 # Manual steps to complete
 # --------------------------------------------------------------------------------
 
+# MANUAL FIX for mod rewrite in /etc/apache2/apache2.conf
+# For <Directory /> and <Directory /var/www/> change AllowOverride None to AllowOverride All. 
+# This should be on, or very close to lines 161 and 172 of /etc/apache2/apache2.conf
+
 # Disable redis persistance
 #   sudo nano /etc/redis/redis.conf
 #   # save 900 1
