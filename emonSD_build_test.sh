@@ -8,23 +8,31 @@
 # Status: Work in Progress
 # --------------------------------------------------------------------------------
 
+# Review splitting this up into seperate scripts
+# - emoncms installer
+# - emonhub installer
+
+# Format as documentation
+
 #! /bin/sh
 
 USER=pi
 
 sudo apt-get update -y
 sudo apt-get upgrade -y
+# sudo apt-get -y dist-upgrade
+sudo apt-get clean
 
 # Needed on stock raspbian lite 19th March 2019
 sudo apt --fix-broken install
 
 # Emoncms install process from:
 # https://github.com/emoncms/emoncms/blob/master/docs/RaspberryPi/readme.md
-sudo apt-get install -y apache2 mariadb-server mysql-client php7.0 libapache2-mod-php7.0 php7.0-mysql php7.0-gd php7.0-opcache php7.0-curl php-pear php7.0-dev php7.0-mcrypt php7.0-common redis-server php-redis git build-essential php7.0-mbstring libmosquitto-dev mosquitto python-pip python-dev
+sudo apt-get install -y apache2 mariadb-server mysql-client php7.0 libapache2-mod-php7.0 php7.0-mysql php7.0-gd php7.0-opcache php7.0-curl php-pear php7.0-dev php7.0-mcrypt php7.0-common redis-server git build-essential php7.0-mbstring libmosquitto-dev mosquitto python-pip python-dev gettext
 
 # Install the pecl dependencies
 sudo pecl channel-update pecl.php.net
-printf "\n" | sudo pecl install redis Mosquitto-alpha
+printf "\n" | sudo pecl install redis Mosquitto-beta
 
 # Add redis to php mods available 
 printf "extension=redis.so" | sudo tee /etc/php/7.0/mods-available/redis.ini 1>&2
@@ -107,6 +115,7 @@ sudo systemctl start service-runner.service
 # --------------------------------------------------------------------------------
 # Install Emoncms Modules
 # --------------------------------------------------------------------------------
+# Review default branch: e.g stable
 cd /var/www/emoncms/Modules
 git clone https://github.com/emoncms/config.git
 git clone https://github.com/emoncms/graph.git
@@ -115,13 +124,18 @@ git clone https://github.com/emoncms/device.git
 git clone https://github.com/emoncms/app.git
 git clone https://github.com/emoncms/wifi.git
 
-cd /home/pi/
+# Install emoncms modules that do not reside in /var/www/emoncms/Modules in user home
+# Review installing these modules within a dedicated directory, e.g:
+# mkdir /home/pi/EmoncmsModules
+# cd /home/pi/EmoncmsModules
+cd /home/pi
 git clone https://github.com/emoncms/backup.git
 git clone https://github.com/emoncms/postprocess.git
 git clone https://github.com/emoncms/usefulscripts.git
 git clone https://github.com/emoncms/demandshaper.git
 git clone https://github.com/emoncms/sync.git
 # Symlink emoncms module folders here...
+# Review consistent approach here
 
 # --------------------------------------------------------------------------------
 # Install EmonHub
@@ -156,6 +170,7 @@ sudo touch /boot/emonSD-30Oct18
 # Install log2ram, so that logging is on RAM to reduce SD card wear.
 # Logs are written to disk every hour or at shutdown
 # --------------------------------------------------------------------------------
+# Review: @pb66 modifications, rotated logs are moved out of ram&sync cycle
 curl -Lo log2ram.tar.gz https://github.com/azlux/log2ram/archive/master.tar.gz
 tar xf log2ram.tar.gz
 cd log2ram-master
@@ -168,6 +183,19 @@ rm -r log2ram-master
 # --------------------------------------------------------------------------------
 cd
 git clone https://github.com/openenergymonitor/avrdude-rpi.git ~/avrdude-rpi && ~/avrdude-rpi/install
+
+# --------------------------------------------------------------------------------
+# Misc
+# --------------------------------------------------------------------------------
+
+# Set default SSH password:
+printf "raspberry\nemonpi2016\nemonpi2016" | passwd
+
+# Set hostname
+hostname=emonpi
+sudo sed -i "s/$HOSTNAME/$hostname/g" /etc/hosts
+printf $hostname | sudo tee /etc/hostname > /dev/null
+
 
 # --------------------------------------------------------------------------------
 # Manual steps to complete
@@ -231,6 +259,19 @@ git clone https://github.com/openenergymonitor/avrdude-rpi.git ~/avrdude-rpi && 
 # sudo nano /boot/cmdline.txt
 # see: https://github.com/openenergymonitor/emonpi/blob/master/docs/SD-card-build.md#raspi-serial-port-setup
 
+# REVIEW: Force NTP update 
+# is this needed now that image is not read only?
+# 0 * * * * /home/pi/emonpi/ntp_update.sh >> /var/log/ntp_update.log 2>&1
+
+# Emoncms Language Support
+# sudo dpkg-reconfigure locales
+
+# Configure UFW firewall
+# sudo ufw allow 80/tcp
+# sudo ufw allow 443/tcp (optional, HTTPS not present)
+# sudo ufw allow 22/tcp
+# sudo ufw allow 1883/tcp (optional, Mosquitto)
+# sudo ufw enable
 
 sudo reboot
 
