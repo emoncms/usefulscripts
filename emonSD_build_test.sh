@@ -156,6 +156,12 @@ cd ..
 rm -r log2ram-master
 
 # --------------------------------------------------------------------------------
+# Enable serial uploads with avrdude and autoreset
+# --------------------------------------------------------------------------------
+cd
+git clone https://github.com/openenergymonitor/avrdude-rpi.git ~/avrdude-rpi && ~/avrdude-rpi/install
+
+# --------------------------------------------------------------------------------
 # Manual steps to complete
 # --------------------------------------------------------------------------------
 
@@ -176,7 +182,9 @@ rm -r log2ram-master
 # disable Pi3 Bluetooth and restore UART0/ttyAMA0 over GPIOs 14 & 15;
 #   sudo nano /boot/config.txt
 # Add to the end of the file
-#   dtoverlay=pi3-disable-bt
+#   dtoverlay=pi3-disable-bt or? dtoverlay=pi3-miniuart-bt (REVIEW THIS)
+# see: https://github.com/openenergymonitor/emonpi/blob/master/docs/SD-card-build.md#raspi-serial-port-setup
+
 # We also need to stop the Bluetooth modem trying to use UART
 #   sudo systemctl disable hciuart
 # Remove console
@@ -196,6 +204,16 @@ rm -r log2ram-master
 # Disable mosquitto logging (cant seem to set log level to error?)
 # sudo nano /etc/mosquitto/mosquitto.conf
 # change: log_dest none
+
+# Memory Tweak
+# Append gpu_mem=16 to /boot/config.txt this caps the RAM available to the GPU. 
+# Since we are running headless this will give us more RAM at the expense of the GPU
+# gpu_mem=16
+
+# change elevator=deadline to elevator=noop (REVIEW THIS)
+# sudo nano /boot/cmdline.txt
+# see: https://github.com/openenergymonitor/emonpi/blob/master/docs/SD-card-build.md#raspi-serial-port-setup
+
 
 sudo reboot
 
