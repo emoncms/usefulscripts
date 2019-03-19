@@ -189,6 +189,10 @@ rm -r log2ram-master
 # sudo nano /etc/rsyslog.conf
 # change syslog line to: *.*;auth,authpriv.none,daemon.none      -/var/log/syslog
 
+# Disable apache2 access logs
+# sudo nano /etc/apache2/sites-available/000-default.conf (comment access.log)
+# sudo nano /etc/apache2/conf-available/other-vhosts-access-log.conf (comment CustomLog)
+
 sudo reboot
 
 # --------------------------------------------------------------------------------
