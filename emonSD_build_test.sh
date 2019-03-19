@@ -119,18 +119,6 @@ git clone https://github.com/emoncms/sync.git
 # --------------------------------------------------------------------------------
 # Install EmonHub
 # --------------------------------------------------------------------------------
-# RaspberryPi Serial configuration
-
-# disable Pi3 Bluetooth and restore UART0/ttyAMA0 over GPIOs 14 & 15;
-#   sudo nano /boot/config.txt
-# Add to the end of the file
-#   dtoverlay=pi3-disable-bt
-# We also need to stop the Bluetooth modem trying to use UART
-#   sudo systemctl disable hciuart
-# Remove console
-#   sudo nano /boot/cmdline.txt
-#   remove: console=serial0,115200
-
 sudo systemctl stop serial-getty@ttyAMA0.service
 sudo systemctl disable serial-getty@ttyAMA0.service
 
@@ -157,11 +145,8 @@ sudo touch /boot/emonSD-30Oct18
 # !!!! avrdude and emonPiLCD still to install !!!! 
 
 # --------------------------------------------------------------------------------
-# Optional steps:
+# Manual steps to complete
 # --------------------------------------------------------------------------------
-# 1. Expand file-system (appears already expanded)
-# 2. Change hostname 
-# 3. Change password
 
 # Disable redis persistance
 #   sudo nano /etc/redis/redis.conf
@@ -172,4 +157,22 @@ sudo touch /boot/emonSD-30Oct18
 
 # MODIFY emoncms/settings.php TO USE /var/lib/phpfina etc locations
 
-# Enable serial see steps above
+# RaspberryPi Serial configuration
+# disable Pi3 Bluetooth and restore UART0/ttyAMA0 over GPIOs 14 & 15;
+#   sudo nano /boot/config.txt
+# Add to the end of the file
+#   dtoverlay=pi3-disable-bt
+# We also need to stop the Bluetooth modem trying to use UART
+#   sudo systemctl disable hciuart
+# Remove console
+#   sudo nano /boot/cmdline.txt
+#   remove: console=serial0,115200
+
+sudo reboot
+
+# --------------------------------------------------------------------------------
+# Optional steps:
+# --------------------------------------------------------------------------------
+# 1. Expand file-system (appears already expanded)
+# 2. Change hostname 
+# 3. Change password
