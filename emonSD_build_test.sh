@@ -187,6 +187,7 @@ git clone https://github.com/openenergymonitor/avrdude-rpi.git ~/avrdude-rpi && 
 # --------------------------------------------------------------------------------
 # Misc
 # --------------------------------------------------------------------------------
+# Review: provide configuration file for default password and hostname
 
 # Set default SSH password:
 printf "raspberry\nemonpi2016\nemonpi2016" | passwd
