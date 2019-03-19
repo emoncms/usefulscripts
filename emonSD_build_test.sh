@@ -204,6 +204,7 @@ git clone https://github.com/openenergymonitor/avrdude-rpi.git ~/avrdude-rpi && 
 # Disable duplicate daemon.log logging to syslog
 # sudo nano /etc/rsyslog.conf
 # change syslog line to: *.*;auth,authpriv.none,daemon.none      -/var/log/syslog
+# REVIEW: https://openenergymonitor.org/forum-archive/node/12566.html
 
 # Disable apache2 access logs
 # sudo nano /etc/apache2/sites-available/000-default.conf (comment access.log)
