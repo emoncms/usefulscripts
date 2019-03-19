@@ -136,6 +136,7 @@ sudo systemctl start emonhub.service
 # --------------------------------------------------------------------------------
 cd /home/pi/
 git clone https://github.com/openenergymonitor/emonpi.git
+git clone https://github.com/openenergymonitor/RFM2Pi
 
 # Enable service-runner update
 # emonpi update checks for image type and only runs with a valid image name file in the boot partition
