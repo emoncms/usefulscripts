@@ -193,6 +193,10 @@ rm -r log2ram-master
 # sudo nano /etc/apache2/sites-available/000-default.conf (comment access.log)
 # sudo nano /etc/apache2/conf-available/other-vhosts-access-log.conf (comment CustomLog)
 
+# Disable mosquitto logging (cant seem to set log level to error?)
+# sudo nano /etc/mosquitto/mosquitto.conf
+# change: log_dest none
+
 sudo reboot
 
 # --------------------------------------------------------------------------------
