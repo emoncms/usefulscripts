@@ -150,6 +150,7 @@ cd /home/pi/
 git clone https://github.com/openenergymonitor/emonpi.git
 
 # Enable service-runner update
+# emonpi update checks for image type and only runs with a valid image name file in the boot partition
 sudo touch /boot/emonSD-30Oct18
 
 # Try running emoncms Update
