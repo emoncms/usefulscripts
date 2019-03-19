@@ -1,11 +1,11 @@
 # --------------------------------------------------------------------------------
-# THIS IS WORK IN PROGRESS
-#
 # RaspberryPi Strech Build Script
 # Emoncms, Emoncms Modules, EmonHub & dependencies
 #
 # Tested with: Raspbian Strech
 # Date: 19 March 2019
+#
+# Status: Work in Progress
 # --------------------------------------------------------------------------------
 
 #! /bin/sh
@@ -139,6 +139,7 @@ git clone https://github.com/openenergymonitor/emonhub.git
 mkdir data
 sudo apt-get install -y python-serial python-configobj python-requests
 sudo pip install paho-mqtt
+cd /home/pi/emonhub
 sudo ./install.systemd
 sudo systemctl start emonhub.service
 
@@ -167,3 +168,7 @@ sudo touch /boot/emonSD-30Oct18
 #   # save 300 10
 #   # save 60 10000
 #   sudo service redis-server restart
+
+# MODIFY emoncms/settings.php TO USE /var/lib/phpfina etc locations
+
+# Enable serial see steps above
