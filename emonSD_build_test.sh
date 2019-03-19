@@ -79,7 +79,7 @@ cd /var/www/html && sudo ln -s /var/www/emoncms
 # Redirect
 echo "<?php header('Location: ../emoncms'); ?>" > /home/pi/index.php
 sudo mv /home/pi/index.php /var/www/html/index.php
-
+sudo rm /var/www/html/index.html
 # --------------------------------------------------------------------------------
 # Install Emoncms Services
 # --------------------------------------------------------------------------------
