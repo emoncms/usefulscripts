@@ -18,6 +18,8 @@
 
 USER=pi
 HOMEDIR=/home/pi
+DEFAULT_SSH_PASSWORD=emonpi2016
+hostname=emonpi
 
 sudo apt-get update -y
 # sudo apt-get upgrade -y
@@ -201,13 +203,18 @@ git clone https://github.com/openenergymonitor/avrdude-rpi.git ~/avrdude-rpi && 
 # Review: provide configuration file for default password and hostname
 
 # Set default SSH password:
-printf "raspberry\nemonpi2016\nemonpi2016" | passwd
+printf "raspberry\n$DEFAULT_SSH_PASSWORD\n$DEFAULT_SSH_PASSWORD" | passwd
 
 # Set hostname
-hostname=emonpi
-sudo sed -i "s/$HOSTNAME/$hostname/g" /etc/hosts
+sudo sed -i "s/raspberrypi/$hostname/g" /etc/hosts
 printf $hostname | sudo tee /etc/hostname > /dev/null
 
+# Configure UFW firewall
+sudo ufw allow 80/tcp
+# sudo ufw allow 443/tcp (optional, HTTPS not present)
+sudo ufw allow 22/tcp
+sudo ufw allow 1883/tcp #(optional, Mosquitto)
+sudo ufw enable
 
 # --------------------------------------------------------------------------------
 # Manual steps to complete
@@ -274,18 +281,4 @@ printf $hostname | sudo tee /etc/hostname > /dev/null
 # Emoncms Language Support
 # sudo dpkg-reconfigure locales
 
-# Configure UFW firewall
-# sudo ufw allow 80/tcp
-# sudo ufw allow 443/tcp (optional, HTTPS not present)
-# sudo ufw allow 22/tcp
-# sudo ufw allow 1883/tcp (optional, Mosquitto)
-# sudo ufw enable
-
 sudo reboot
-
-# --------------------------------------------------------------------------------
-# Optional steps:
-# --------------------------------------------------------------------------------
-# 1. Expand file-system (appears already expanded)
-# 2. Change hostname 
-# 3. Change password
