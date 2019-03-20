@@ -109,8 +109,12 @@ sudo mysql -e "CREATE DATABASE emoncms DEFAULT CHARACTER SET utf8;"
 sudo mysql -e "CREATE USER 'emoncms'@'localhost' IDENTIFIED BY 'emonpiemoncmsmysql2016'; GRANT ALL ON emoncms.* TO 'emoncms'@'localhost'; flush privileges;"
 
 # Create data repositories for emoncms feed engines:
-sudo mkdir /var/lib/{phpfiwa,phpfina,phptimeseries}
-sudo chown www-data:root /var/lib/{phpfiwa,phpfina,phptimeseries}
+sudo mkdir /var/lib/phpfiwa
+sudo mkdir /var/lib/phpfina
+sudo mkdir /var/lib/phptimeseries
+sudo chown www-data:root /var/lib/phpfiwa
+sudo chown www-data:root /var/lib/phpfina
+sudo chown www-data:root /var/lib/phptimeseries
 
 # --------------------------------------------------------------------------------
 # Install Emoncms Core
