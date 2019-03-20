@@ -138,6 +138,9 @@ sed -i "s/\/home\/pi\/data\/phpfina\//\/var\/lib\/phpfina\//" settings.php
 sed -i "s/\/home\/pi\/data\/phptimeseries\//\/var\/lib\/phptimeseries\//" settings.php
 sed -i "s/\/home\/pi\/data\/phpfiwa\//\/var\/lib\/phpfiwa\//" settings.php
 
+# use /usr/emoncms/modules as symlinked modules directory
+sed -i 's/$homedir = "\/home\/pi";/$homedir = "\/usr\/emoncms\/modules";/' settings.php
+
 # Create a symlink to reference emoncms within the web root folder:
 cd /var/www/html && sudo ln -s /var/www/emoncms
 
@@ -177,16 +180,29 @@ git clone https://github.com/emoncms/device.git
 git clone https://github.com/emoncms/app.git
 git clone https://github.com/emoncms/wifi.git
 
-# Install emoncms modules that do not reside in /var/www/emoncms/Modules in user home
-# Review installing these modules within a dedicated directory, e.g:
-# mkdir /home/pi/EmoncmsModules
-# cd /home/pi/EmoncmsModules
-cd /home/pi
+# Install emoncms modules that do not reside in /var/www/emoncms/Modules
+
+sudo mkdir /usr/emoncms
+sudo chown $USER /usr/emoncms
+mkdir /usr/emoncms/modules
+cd /usr/emoncms/modules
+
+# Rename emoncms module component to backup-module
 git clone https://github.com/emoncms/backup.git
+ln -s /usr/emoncms/modules/backup/backup /var/www/emoncms/Modules/backup
+
 git clone https://github.com/emoncms/postprocess.git
-git clone https://github.com/emoncms/usefulscripts.git
+ln -s /usr/emoncms/modules/postprocess/postprocess-module /var/www/emoncms/Modules/postprocess
+
 git clone https://github.com/emoncms/demandshaper.git
+ln -s /usr/emoncms/modules/demandshaper/demandshaper-module /var/www/emoncms/Modules/demandshaper
+
 git clone https://github.com/emoncms/sync.git
+ln -s /usr/emoncms/modules/sync/sync-module /var/www/emoncms/Modules/sync
+
+cd /home/pi
+git clone https://github.com/emoncms/usefulscripts.git
+
 # Symlink emoncms module folders here...
 # Review consistent approach here
 
