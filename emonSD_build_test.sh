@@ -194,8 +194,13 @@ cd /usr/emoncms/modules
 
 # Rename emoncms module component to backup-module
 git clone https://github.com/emoncms/backup.git
+cd backup
+git checkout multienv
+cp default.emonpi.config.cfg config.cfg
+sed -i "s/\/home\/pi\/backup/\/usr\/emoncms\/modules\/backup/" config.cfg
 ln -s /usr/emoncms/modules/backup/backup /var/www/emoncms/Modules/backup
 
+cd /usr/emoncms/modules
 git clone https://github.com/emoncms/postprocess.git
 ln -s /usr/emoncms/modules/postprocess/postprocess-module /var/www/emoncms/Modules/postprocess
 
