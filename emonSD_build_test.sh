@@ -185,6 +185,11 @@ git clone https://github.com/emoncms/wifi.git
 sudo mkdir /usr/emoncms
 sudo chown $USER /usr/emoncms
 mkdir /usr/emoncms/modules
+
+# emoncms-sync.log is written to data folder
+# change to /var/log or use emoncms logger
+mkdir /usr/emoncms/modules/data
+
 cd /usr/emoncms/modules
 
 # Rename emoncms module component to backup-module
