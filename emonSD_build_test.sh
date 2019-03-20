@@ -37,24 +37,44 @@ sudo apt-get install -y apache2 mariadb-server mysql-client php7.0 libapache2-mo
 sudo pecl channel-update pecl.php.net
 printf "\n" | sudo pecl install redis Mosquitto-beta
 
+# --------------------------------------------------------------------------------
+# Redis configuration
+# --------------------------------------------------------------------------------
+
 # Add redis to php mods available 
 printf "extension=redis.so" | sudo tee /etc/php/7.0/mods-available/redis.ini 1>&2
 sudo phpenmod redis
+
+# Disable redis persistance
+sudo sed -i "s/^save 900 1/#save 900 1/" /etc/redis/redis.conf
+sudo sed -i "s/^save 300 1/#save 300 1/" /etc/redis/redis.conf
+sudo sed -i "s/^save 60 1/#save 60 1/" /etc/redis/redis.conf
+sudo service redis-server restart
+
+# --------------------------------------------------------------------------------
+# Mosquitto configuration
+# --------------------------------------------------------------------------------
 
 # Add mosquitto to php mods available
 printf "extension=mosquitto.so" | sudo tee /etc/php/7.0/mods-available/mosquitto.ini 1>&2
 sudo phpenmod mosquitto
 
 # Disable mosquitto persistance
-#   sudo nano mosquitto.conf
-#   Set persistence false
-#   Add lines:
-#     allow_anonymous false
-#     password_file /etc/mosquitto/passwd
-#     log_type error
-#   Create password file
-#     sudo mosquitto_passwd -c /etc/mosquitto/passwd emonpi
-#     default: emonpimqtt2016
+sudo sed -i "s/^persistence true/persistence false/" /etc/mosquitto/mosquitto.conf
+# append line: allow_anonymous false
+sudo sed -i -n '/allow_anonymous false/!p;$a allow_anonymous false' /etc/mosquitto/mosquitto.conf
+# append line: password_file /etc/mosquitto/passwd
+sudo sed -i -n '/password_file \/etc\/mosquitto\/passwd/!p;$a password_file \/etc\/mosquitto\/passwd' /etc/mosquitto/mosquitto.conf
+# append line: log_type error
+sudo sed -i -n '/log_type error/!p;$a log_type error' /etc/mosquitto/mosquitto.conf
+
+# Create mosquitto password file
+sudo touch /etc/mosquitto/passwd
+sudo mosquitto_passwd -b /etc/mosquitto/passwd emonpi emonpimqtt2016
+
+# --------------------------------------------------------------------------------
+# Apache configuration
+# --------------------------------------------------------------------------------
 
 # Enable apache mod rewrite
 sudo a2enmod rewrite
@@ -71,16 +91,12 @@ sudo mv $HOMEDIR/emoncms.conf /etc/apache2/sites-available/emoncms.conf
 # Review is this line needed? if so check for existing entry
 # printf "ServerName localhost" | sudo tee -a /etc/apache2/apache2.conf 1>&2
 sudo a2ensite emoncms
+
+# Disable apache2 access logs
+sudo sed -i "s/^\tCustomLog/\t#CustomLog/" /etc/apache2/sites-available/000-default.conf
+sudo sed -i "s/^CustomLog/#CustomLog/" /etc/apache2/conf-available/other-vhosts-access-log.conf
+
 sudo service apache2 restart
-
-# Emoncms install
-# Give pi user ownership over /var/www/ folder
-sudo chown $USER /var/www
-cd /var/www && git clone -b stable https://github.com/emoncms/emoncms.git
-
-# Create logfile
-sudo touch /var/log/emoncms.log
-sudo chmod 666 /var/log/emoncms.log
 
 # --------------------------------------------------------------------------------
 # Setup the Mariadb server (MYSQL)
@@ -96,6 +112,19 @@ sudo mysql -e "CREATE USER 'emoncms'@'localhost' IDENTIFIED BY 'emonpiemoncmsmys
 sudo mkdir /var/lib/{phpfiwa,phpfina,phptimeseries}
 sudo chown www-data:root /var/lib/{phpfiwa,phpfina,phptimeseries}
 
+# --------------------------------------------------------------------------------
+# Install Emoncms Core
+# --------------------------------------------------------------------------------
+
+# Emoncms install
+# Give pi user ownership over /var/www/ folder
+sudo chown $USER /var/www
+cd /var/www && git clone -b stable https://github.com/emoncms/emoncms.git
+
+# Create logfile
+sudo touch /var/log/emoncms.log
+sudo chmod 666 /var/log/emoncms.log
+
 # Configure emoncms database settings
 # Make a copy of default.settings.php and call it settings.php:
 cd /var/www/emoncms && cp default.emonpi.settings.php settings.php
@@ -108,9 +137,11 @@ cd /var/www/html && sudo ln -s /var/www/emoncms
 echo "<?php header('Location: ../emoncms'); ?>" > /home/pi/index.php
 sudo mv /home/pi/index.php /var/www/html/index.php
 sudo rm /var/www/html/index.html
+
 # --------------------------------------------------------------------------------
 # Install Emoncms Services
 # --------------------------------------------------------------------------------
+
 # Emoncms MQTT
 sudo ln -s /var/www/emoncms/scripts/services/emoncms_mqtt/emoncms_mqtt.service /lib/systemd/system
 sudo systemctl enable emoncms_mqtt.service
@@ -128,6 +159,7 @@ sudo systemctl start service-runner.service
 # --------------------------------------------------------------------------------
 # Install Emoncms Modules
 # --------------------------------------------------------------------------------
+
 # Review default branch: e.g stable
 cd /var/www/emoncms/Modules
 git clone https://github.com/emoncms/config.git
@@ -220,13 +252,6 @@ sudo ufw enable
 # Manual steps to complete
 # --------------------------------------------------------------------------------
 
-# Disable redis persistance
-#   sudo nano /etc/redis/redis.conf
-#   # save 900 1
-#   # save 300 10
-#   # save 60 10000
-#   sudo service redis-server restart
-
 # MODIFY emoncms/settings.php TO USE /var/lib/phpfina etc locations
 
 # RaspberryPi Serial configuration
@@ -248,22 +273,6 @@ sudo ufw enable
 # sudo nano /etc/rsyslog.conf
 # change syslog line to: *.*;auth,authpriv.none,daemon.none      -/var/log/syslog
 # REVIEW: https://openenergymonitor.org/forum-archive/node/12566.html
-
-# Disable apache2 access logs
-# sudo nano /etc/apache2/sites-available/000-default.conf (comment access.log)
-# sudo nano /etc/apache2/conf-available/other-vhosts-access-log.conf (comment CustomLog)
-
-# Disable mosquitto logging (cant seem to set log level to error?)
-# sudo nano /etc/mosquitto/mosquitto.conf
-# change: log_dest none
-#   Set persistence false
-#   Add lines:
-#     allow_anonymous false
-#     password_file /etc/mosquitto/passwd
-#     log_type error
-#   Create password file
-#     sudo mosquitto_passwd -c /etc/mosquitto/passwd emonpi
-#     default: emonpimqtt2016
 
 # Memory Tweak
 # Append gpu_mem=16 to /boot/config.txt this caps the RAM available to the GPU. 
