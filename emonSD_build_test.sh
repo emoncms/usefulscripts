@@ -128,7 +128,11 @@ sudo chmod 666 /var/log/emoncms.log
 # Configure emoncms database settings
 # Make a copy of default.settings.php and call it settings.php:
 cd /var/www/emoncms && cp default.emonpi.settings.php settings.php
-# MODIFY TO USE /var/lib/phpfina etc locations
+
+# Temporary: Replace this with default settings file
+sed -i "s/\/home\/pi\/data\/phpfina\//\/var\/lib\/phpfina\//" settings.php
+sed -i "s/\/home\/pi\/data\/phptimeseries\//\/var\/lib\/phptimeseries\//" settings.php
+sed -i "s/\/home\/pi\/data\/phpfiwa\//\/var\/lib\/phpfiwa\//" settings.php
 
 # Create a symlink to reference emoncms within the web root folder:
 cd /var/www/html && sudo ln -s /var/www/emoncms
@@ -185,6 +189,18 @@ git clone https://github.com/emoncms/sync.git
 # --------------------------------------------------------------------------------
 # Install EmonHub
 # --------------------------------------------------------------------------------
+# RaspberryPi Serial configuration
+# disable Pi3 Bluetooth and restore UART0/ttyAMA0 over GPIOs 14 & 15;
+# Review should this be: dtoverlay=pi3-miniuart-bt?
+sudo sed -i -n '/dtoverlay=pi3-disable-bt/!p;$a dtoverlay=pi3-disable-bt' /boot/config.txt
+
+# We also need to stop the Bluetooth modem trying to use UART
+sudo systemctl disable hciuart
+
+# Remove console from /boot/cmdline.txt
+sudo sed -i "s/console=serial0,115200 //" /boot/cmdline.txt
+
+# stop and disable serial service??
 sudo systemctl stop serial-getty@ttyAMA0.service
 sudo systemctl disable serial-getty@ttyAMA0.service
 
@@ -196,6 +212,9 @@ sudo pip install paho-mqtt
 cd /home/pi/emonhub
 sudo ./install.systemd
 sudo systemctl start emonhub.service
+
+# Temporary: replace with update to default settings file
+sed -i "s/loglevel = DEBUG/loglevel = WARNING/" /home/pi/data/emonhub.conf
 
 # --------------------------------------------------------------------------------
 # EmonPi repo
@@ -248,46 +267,24 @@ sudo ufw allow 22/tcp
 sudo ufw allow 1883/tcp #(optional, Mosquitto)
 sudo ufw enable
 
-# --------------------------------------------------------------------------------
-# Manual steps to complete
-# --------------------------------------------------------------------------------
-
-# MODIFY emoncms/settings.php TO USE /var/lib/phpfina etc locations
-
-# RaspberryPi Serial configuration
-# disable Pi3 Bluetooth and restore UART0/ttyAMA0 over GPIOs 14 & 15;
-#   sudo nano /boot/config.txt
-# Add to the end of the file
-#   dtoverlay=pi3-disable-bt or? dtoverlay=pi3-miniuart-bt (REVIEW THIS)
-# see: https://github.com/openenergymonitor/emonpi/blob/master/docs/SD-card-build.md#raspi-serial-port-setup
-
-# We also need to stop the Bluetooth modem trying to use UART
-#   sudo systemctl disable hciuart
-# Remove console
-#   sudo nano /boot/cmdline.txt
-#   remove: console=serial0,115200
-
-# Change emonhub logging level to WARNING
-
 # Disable duplicate daemon.log logging to syslog
-# sudo nano /etc/rsyslog.conf
-# change syslog line to: *.*;auth,authpriv.none,daemon.none      -/var/log/syslog
+sudo sed -i "s/*.*;auth,authpriv.none\t\t-\/var\/log\/syslog/*.*;auth,authpriv.none,daemon.none\t\t-\/var\/log\/syslog/" /etc/rsyslog.conf
 # REVIEW: https://openenergymonitor.org/forum-archive/node/12566.html
 
-# Memory Tweak
+# Review: Memory Tweak
 # Append gpu_mem=16 to /boot/config.txt this caps the RAM available to the GPU. 
 # Since we are running headless this will give us more RAM at the expense of the GPU
 # gpu_mem=16
 
-# change elevator=deadline to elevator=noop (REVIEW THIS)
+# Review: change elevator=deadline to elevator=noop
 # sudo nano /boot/cmdline.txt
 # see: https://github.com/openenergymonitor/emonpi/blob/master/docs/SD-card-build.md#raspi-serial-port-setup
 
-# REVIEW: Force NTP update 
+# Review: Force NTP update 
 # is this needed now that image is not read only?
 # 0 * * * * /home/pi/emonpi/ntp_update.sh >> /var/log/ntp_update.log 2>&1
 
-# Emoncms Language Support
+# Review automated install: Emoncms Language Support
 # sudo dpkg-reconfigure locales
 
 sudo reboot
