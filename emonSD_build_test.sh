@@ -261,14 +261,16 @@ sudo sed -i "s/raspberrypi/$hostname/g" /etc/hosts
 printf $hostname | sudo tee /etc/hostname > /dev/null
 
 # Configure UFW firewall
-sudo ufw allow 80/tcp
+# Review: reboot required before running:
+# sudo ufw allow 80/tcp
 # sudo ufw allow 443/tcp (optional, HTTPS not present)
-sudo ufw allow 22/tcp
-sudo ufw allow 1883/tcp #(optional, Mosquitto)
-sudo ufw enable
+# sudo ufw allow 22/tcp
+# sudo ufw allow 1883/tcp #(optional, Mosquitto)
+# sudo ufw enable
 
 # Disable duplicate daemon.log logging to syslog
 sudo sed -i "s/*.*;auth,authpriv.none\t\t-\/var\/log\/syslog/*.*;auth,authpriv.none,daemon.none\t\t-\/var\/log\/syslog/" /etc/rsyslog.conf
+sudo service rsyslog restart
 # REVIEW: https://openenergymonitor.org/forum-archive/node/12566.html
 
 # Review: Memory Tweak
