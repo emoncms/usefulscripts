@@ -207,8 +207,8 @@ sudo systemctl disable serial-getty@ttyAMA0.service
 cd /home/pi
 git clone https://github.com/openenergymonitor/emonhub.git
 mkdir data
-sudo apt-get install -y python-serial python-configobj python-requests
-sudo pip install paho-mqtt
+sudo apt-get install -y python-serial python-configobj
+sudo pip install paho-mqtt requests
 cd /home/pi/emonhub
 sudo ./install.systemd
 sudo systemctl start emonhub.service
@@ -222,6 +222,18 @@ sed -i "s/loglevel = DEBUG/loglevel = WARNING/" /home/pi/data/emonhub.conf
 cd /home/pi/
 git clone https://github.com/openenergymonitor/emonpi.git
 git clone https://github.com/openenergymonitor/RFM2Pi
+
+
+# --------------------------------------------------------------------------------
+# EmonPi LCD Support
+# --------------------------------------------------------------------------------
+sudo apt-get install -y python-smbus i2c-tools python-rpi.gpio python-gpiozero
+sudo pip install xmltodict
+
+# Uncomment dtparam=i2c_arm=on
+sudo sed -i "s/^#dtparam=i2c_arm=on/dtparam=i2c_arm=on/" /boot/config.txt
+# Append line i2c-dev to /etc/modules
+sudo sed -i -n '/i2c-dev/!p;$a i2c-dev' /etc/modules
 
 # Enable service-runner update
 # emonpi update checks for image type and only runs with a valid image name file in the boot partition
