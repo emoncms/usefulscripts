@@ -17,7 +17,7 @@
 #! /bin/sh
 
 USER=pi
-HOMEDIR=/home/pi
+homedir=/home/pi
 DEFAULT_SSH_PASSWORD=emonpi2016
 hostname=emonpi
 
@@ -78,7 +78,7 @@ sudo mosquitto_passwd -b /etc/mosquitto/passwd emonpi emonpimqtt2016
 
 # Enable apache mod rewrite
 sudo a2enmod rewrite
-cat <<EOF >> $HOMEDIR/emoncms.conf
+cat <<EOF >> $homedir/emoncms.conf
 <Directory /var/www/html/emoncms>
     Options FollowSymLinks
     AllowOverride All
@@ -87,7 +87,7 @@ cat <<EOF >> $HOMEDIR/emoncms.conf
     Allow from all
 </Directory>
 EOF
-sudo mv $HOMEDIR/emoncms.conf /etc/apache2/sites-available/emoncms.conf
+sudo mv $homedir/emoncms.conf /etc/apache2/sites-available/emoncms.conf
 # Review is this line needed? if so check for existing entry
 # printf "ServerName localhost" | sudo tee -a /etc/apache2/apache2.conf 1>&2
 sudo a2ensite emoncms
@@ -215,6 +215,21 @@ git clone https://github.com/emoncms/usefulscripts.git
 
 # Symlink emoncms module folders here...
 # Review consistent approach here
+
+sudo visudo -cf $homedir/emonpi/emoncms-rebootbutton && \
+sudo cp $homedir/emonpi/emoncms-rebootbutton /etc/sudoers.d/
+sudo chmod 0440 /etc/sudoers.d/emoncms-rebootbutton
+echo "Install emonPi Emoncms admin reboot button sudoers entry"
+        
+sudo visudo -cf $homedir/emonpi/emonhub-sudoers && \
+sudo cp $homedir/emonpi/emonhub-sudoers /etc/sudoers.d/
+sudo chmod 0440 /etc/sudoers.d/emonhub-sudoers
+echo "emonhub service control sudoers entry installed"
+
+sudo visudo -cf $homedir/emonpi/emoncms-setup/emoncms-setup-sudoers && \
+sudo cp $homedir/emonpi/emoncms-setup/emoncms-setup-sudoers /etc/sudoers.d/
+sudo chmod 0440 /etc/sudoers.d/emoncms-setup-sudoers
+echo "Emoncms setup module sudoers entry installed"
 
 # --------------------------------------------------------------------------------
 # Install EmonHub
