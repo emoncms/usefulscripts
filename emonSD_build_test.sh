@@ -226,6 +226,11 @@ sudo cp $homedir/emonpi/emonhub-sudoers /etc/sudoers.d/
 sudo chmod 0440 /etc/sudoers.d/emonhub-sudoers
 echo "emonhub service control sudoers entry installed"
 
+sudo visudo -cf $homedir/emonpi/wifi-sudoers && \
+sudo cp $homedir/emonpi/wifi-sudoers /etc/sudoers.d/
+sudo chmod 0440 /etc/sudoers.d/wifi-sudoers
+echo "wifi sudoers entry installed"
+
 sudo visudo -cf $homedir/emonpi/emoncms-setup/emoncms-setup-sudoers && \
 sudo cp $homedir/emonpi/emoncms-setup/emoncms-setup-sudoers /etc/sudoers.d/
 sudo chmod 0440 /etc/sudoers.d/emoncms-setup-sudoers
