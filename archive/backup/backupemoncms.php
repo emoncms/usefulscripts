@@ -58,7 +58,13 @@ if (! flock($fp, LOCK_EX | LOCK_NB)) { echo "Already running\n"; die; }
 define('EMONCMS_EXEC', 1);
 
 require "process_settings.php";
-$mysqli = new mysqli($server,$username,$password,$database);
+$mysqli = @new mysqli(
+    $settings["sql"]["server"],
+    $settings["sql"]["username"],
+    $settings["sql"]["password"],
+    $settings["sql"]["database"],
+    $settings["sql"]["port"]
+);
 
 // Fetch the import queue
 $result = $mysqli->query("SELECT * FROM importqueue ORDER BY `queid` Desc LIMIT 640");

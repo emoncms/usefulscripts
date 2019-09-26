@@ -12,9 +12,9 @@
     require "process_settings.php";
     
     $engine = array();
-    $engine[Engine::PHPFINA] = new PHPFina($feed_settings['phpfina']);
-    $engine[Engine::PHPFIWA] = new PHPFiwa($feed_settings['phpfiwa']);
-    $engine[Engine::PHPTIMESERIES] = new PHPTimeSeries($feed_settings['phptimeseries']);
+    $engine[Engine::PHPFINA] = new PHPFina($settings['feed']['phpfina']);
+    $engine[Engine::PHPFIWA] = new PHPFiwa($settings['feed']['phpfiwa']);
+    $engine[Engine::PHPTIMESERIES] = new PHPTimeSeries($settings['feed']['phptimeseries']);
     //=============================================================================
     // SETTINGS:
     
@@ -32,11 +32,11 @@
         
         
     if ($source_engine==Engine::PHPFINA) {
-        echo "Deleting data for ".$feed_settings['phpfina']['datadir'].$target.".dat\n";
-        unlink($feed_settings['phpfina']['datadir'].$target.".dat");
+        echo "Deleting data for ".$settings['feed']['phpfina']['datadir'].$target.".dat\n";
+        unlink($settings['feed']['phpfina']['datadir'].$target.".dat");
         
         echo "Creating new data file\n";
-        $fh = fopen($feed_settings['phpfina']['datadir'].$target.".dat", 'wb');
+        $fh = fopen($settings['feed']['phpfina']['datadir'].$target.".dat", 'wb');
         fclose($fh);
     }
     

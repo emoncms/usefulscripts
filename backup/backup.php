@@ -61,23 +61,32 @@
         define('EMONCMS_EXEC', 1);
         chdir($local_emoncms_location);
         require "process_settings.php";
-        $mysqli = @new mysqli($server,$username,$password,$database);
-        
-        if ($redis_enabled) {
+        $mysqli = @new mysqli(
+            $settings["sql"]["server"],
+            $settings["sql"]["username"],
+            $settings["sql"]["password"],
+            $settings["sql"]["database"],
+            $settings["sql"]["port"]
+        );
+
+        if ($settings['redis']['enabled']) {
             $redis = new Redis();
-            $connected = $redis->connect($redis_server['host'], $redis_server['port']);
-            if (!$connected) { echo "Can't connect to redis at ".$redis_server['host'].":".$redis_server['port']." , it may be that redis-server is not installed or started see readme for redis installation"; die; }
-            if (!empty($redis_server['prefix'])) $redis->setOption(Redis::OPT_PREFIX, $redis_server['prefix']);
-            if (!empty($redis_server['auth'])) {
-                if (!$redis->auth($redis_server['auth'])) {
-                    echo "Can't connect to redis at ".$redis_server['host'].", autentication failed"; die;
+            $connected = $redis->connect($settings['redis']['host'], $settings['redis']['port']);
+            if (!$connected) { echo "Can't connect to redis at ".$settings['redis']['host'].":".$settings['redis']['port']." , it may be that redis-server is not installed or started see readme for redis installation"; die; }
+            if (!empty($settings['redis']['prefix'])) $redis->setOption(Redis::OPT_PREFIX, $settings['redis']['prefix']);
+            if (!empty($settings['redis']['auth'])) {
+                if (!$redis->auth($settings['redis']['auth'])) {
+                    echo "Can't connect to redis at ".$settings['redis']['host'].", autentication failed"; die;
                 }
+            }
+            if (!empty($settings['redis']['dbnum'])) {
+                $redis->select($settings['redis']['dbnum']);
             }
         } else {
             $redis = false;
         }
 
-        $engines = $feed_settings;
+        $engines = $settings['feed'];
         
         if ($backup_inputs) backup_inputs($mysqli,$remote_server,$remote_apikey,$local_emoncms_userid);
     }

@@ -62,7 +62,13 @@ $log->info("Starting create_users_and_devices script");
 // Connect to database
 //*********************
 require "process_settings.php";
-$mysqli = @new mysqli($server, $username, $password, $database, $port);
+$mysqli = @new mysqli(
+    $settings["sql"]["server"],
+    $settings["sql"]["username"],
+    $settings["sql"]["password"],
+    $settings["sql"]["database"],
+    $settings["sql"]["port"]
+);
 if ($mysqli->connect_error)
     die("Can't connect to database:" . $mysqli->connect_error . "\n\n");
 
@@ -70,17 +76,20 @@ if ($mysqli->connect_error)
 //***************
 // Redis
 //***************
-if ($redis_enabled) {
+if ($settings['redis']['enabled']) {
     $redis = new Redis();
-    if (!$redis->connect($redis_server['host'], $redis_server['port']))
-        die("Could not connect to redis at " . $redis_server['host'] . ":" . $redis_server['port'] . "\n\n");
-    $redis->setOption(Redis::OPT_PREFIX, $redis_server['prefix']);
-    if (!empty($redis_server['auth'])) {
-        if (!$redis->auth($redis_server['auth']))
-            die("Could not connect to redis at " . $redis_server['host'] . ", autentication failed" . "\n\n");
+    $connected = $redis->connect($settings['redis']['host'], $settings['redis']['port']);
+    if (!$connected) { echo "Can't connect to redis at ".$settings['redis']['host'].":".$settings['redis']['port']." , it may be that redis-server is not installed or started see readme for redis installation"; die; }
+    if (!empty($settings['redis']['prefix'])) $redis->setOption(Redis::OPT_PREFIX, $settings['redis']['prefix']);
+    if (!empty($settings['redis']['auth'])) {
+        if (!$redis->auth($settings['redis']['auth'])) {
+            echo "Can't connect to redis at ".$settings['redis']['host'].", autentication failed"; die;
+        }
     }
-}
-else {
+    if (!empty($settings['redis']['dbnum'])) {
+        $redis->select($settings['redis']['dbnum']);
+    }
+} else {
     $redis = false;
 }
 
@@ -115,8 +124,7 @@ if (array_key_exists('g', $args))
 //***************
 // Models to use
 //***************
-global $email_verification;
-$email_verification = false;
+$settings['interface']['email_verification'] = false;
 require("Modules/user/user_model.php");
 $user = new User($mysqli, $redis, null);
 
