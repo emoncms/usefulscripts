@@ -26,7 +26,13 @@
     
     chdir("/var/www/emoncms");
     require "process_settings.php";
-    $mysqli = @new mysqli($server,$username,$password,$database);
+    $mysqli = @new mysqli(
+        $settings["sql"]["server"],
+        $settings["sql"]["username"],
+        $settings["sql"]["password"],
+        $settings["sql"]["database"],
+        $settings["sql"]["port"]
+    );
     $result = $mysqli->query("SELECT * FROM feeds");
     
     while($row = $result->fetch_object())
@@ -42,7 +48,7 @@
         if ($row->engine==2) {
             print "PHPTIMESERIES ";
             $datadir = "/var/lib/phptimeseries/";
-            if (isset($feed_settings["phptimeseries"])) $datadir = $feed_settings["phptimeseries"]["datadir"];
+            if (isset($settings["feed"]["phptimeseries"])) $datadir = $settings["feed"]["phptimeseries"]["datadir"];
             print "datadir:".$datadir;
             print " datafile:"; if (file_exists($datadir."feed_".$row->id.".MYD")) print "yes"; else print "no";
         }
@@ -52,13 +58,13 @@
         if ($row->engine==4) {
             print "PHPTIMESTORE ";
             $datadir = "/var/lib/phptimestore/";
-            if (isset($feed_settings["phptimestore"])) $datadir = $feed_settings["phptimestore"]["datadir"];
+            if (isset($settings["feed"]["phptimestore"])) $datadir = $settings["feed"]["phptimestore"]["datadir"];
             print "datadir:".$datadir;
         }
         if ($row->engine==5) {
             print "PHPFINA ";
             $datadir = "/var/lib/phpfina/";
-            if (isset($feed_settings["phpfina"])) $datadir = $feed_settings["phpfina"]["datadir"];
+            if (isset($settings["feed"]["phpfina"])) $datadir = $settings["feed"]["phpfina"]["datadir"];
             print "datadir:".$datadir;
             print " metafile:"; if (file_exists($datadir.$row->id.".meta")) print "yes"; else print "no";
             print " datafile:"; if (file_exists($datadir.$row->id.".dat")) print "yes"; else print "no";
@@ -66,7 +72,7 @@
         if ($row->engine==6) {
             print "PHPFIWA ";
             $datadir = "/var/lib/phpfiwa/";
-            if (isset($feed_settings["phpfiwa"])) $datadir = $feed_settings["phpfiwa"]["datadir"];
+            if (isset($settings["feed"]["phpfiwa"])) $datadir = $settings["feed"]["phpfiwa"]["datadir"];
             print "datadir:".$datadir;
             print " metafile:"; if (file_exists($datadir.$row->id.".meta")) print "yes"; else print "no";
             print " datafile:"; if (file_exists($datadir.$row->id."_0.dat")) print "yes"; else print "no";

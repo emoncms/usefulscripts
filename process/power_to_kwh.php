@@ -30,26 +30,35 @@
     // Load emoncms install
     require "process_settings.php";
     
-    $mysqli = @new mysqli($server,$username,$password,$database);
+    $mysqli = @new mysqli(
+        $settings["sql"]["server"],
+        $settings["sql"]["username"],
+        $settings["sql"]["password"],
+        $settings["sql"]["database"],
+        $settings["sql"]["port"]
+    );
 
-    if (class_exists('Redis') && $redis_enabled) {
+    if ($settings['redis']['enabled']) {
         $redis = new Redis();
-        $connected = $redis->connect($redis_server['host'], $redis_server['port']);
-        if (!$connected) { echo "Can't connect to redis at ".$redis_server['host'].":".$redis_server['port']." , it may be that redis-server is not installed or started see readme for redis installation"; die; }
-        if (!empty($redis_server['prefix'])) $redis->setOption(Redis::OPT_PREFIX, $redis_server['prefix']);
-        if (!empty($redis_server['auth'])) {
-            if (!$redis->auth($redis_server['auth'])) {
-                echo "Can't connect to redis at ".$redis_server['host'].", autentication failed"; die;
+        $connected = $redis->connect($settings['redis']['host'], $settings['redis']['port']);
+        if (!$connected) { echo "Can't connect to redis at ".$settings['redis']['host'].":".$settings['redis']['port']." , it may be that redis-server is not installed or started see readme for redis installation"; die; }
+        if (!empty($settings['redis']['prefix'])) $redis->setOption(Redis::OPT_PREFIX, $settings['redis']['prefix']);
+        if (!empty($settings['redis']['auth'])) {
+            if (!$redis->auth($settings['redis']['auth'])) {
+                echo "Can't connect to redis at ".$settings['redis']['host'].", autentication failed"; die;
             }
+        }
+        if (!empty($settings['redis']['dbnum'])) {
+            $redis->select($settings['redis']['dbnum']);
         }
     } else {
         $redis = false;
     }
 
     $engine = array();
-    $engine[Engine::PHPFINA] = new PHPFina($feed_settings['phpfina']);
-    $engine[Engine::PHPFIWA] = new PHPFiwa($feed_settings['phpfiwa']);
-    $engine[Engine::PHPTIMESERIES] = new PHPTimeSeries($feed_settings['phptimeseries']);
+    $engine[Engine::PHPFINA] = new PHPFina($settings['feed']['phpfina']);
+    $engine[Engine::PHPFIWA] = new PHPFiwa($settings['feed']['phpfiwa']);
+    $engine[Engine::PHPTIMESERIES] = new PHPTimeSeries($settings['feed']['phptimeseries']);
 
     // Power feed selection
     echo "\n";
@@ -206,8 +215,8 @@
     
     print "Recalculated in ".round(microtime(true)-$start)."s\n";
     
-    exec("chown www-data:www-data ".$feed_settings['phpfina']['datadir'].$target.".meta");
-    exec("chown www-data:www-data ".$feed_settings['phpfina']['datadir'].$target.".dat");
+    exec("chown www-data:www-data ".$settings['feed']['phpfina']['datadir'].$target.".meta");
+    exec("chown www-data:www-data ".$settings['feed']['phpfina']['datadir'].$target.".dat");
     
     // force a reload of the feeds table
     if ($redis && $redis->exists("user:feeds:$userid")) {
