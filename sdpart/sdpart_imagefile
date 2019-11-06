@@ -20,11 +20,23 @@ if [ $(id -u) -ne 0 ]; then
   printf "Script must be run as root. Try 'sudo ./sdpart'\n"
   exit 1
 fi
-if [ ! -d "/home/pi/data" ]; then
-  echo This does not appear to be an emoncms imagefile installation
-  echo the script is aborting.
-  exit 1
+
+data_dir="/var/opt/emoncms"
+
+if [ -d "/home/pi" ]; then
+  if [ -d "/home/pi/data" ]; then
+    data_dir="/home/pi/data"
+  elif [ -d "/var/opt/emoncms" ]; then
+    data_dir="/var/opt/emoncms"
+  else
+    echo This does not appear to be an emoncms imagefile installation
+    echo the script is aborting.
+    exit 1
+  fi
 fi
+
+echo "data_dir: $data_dir"
+
 ###################################################################
 rpi-rw
 echo
@@ -58,7 +70,10 @@ if [[ $response =~ ^([nN][oO]|[nN])$ ]]
 then
 exit 1
 else
-rpi-rw
+
+if [ -f /usr/bin/rpi-rw ]; then
+  rpi-rw
+fi
 ###################################################################
 # Create a systemd unit file to extend filesystem after a reboot
 cat <<\EOF > /lib/systemd/system/resize2fs_once.service &&
@@ -94,11 +109,13 @@ cat <<\EOF > /home/pi/resize2fs_once.sh &&
     umount /dev/mmcblk0p3
     e2fsck -yf /dev/mmcblk0p3
     resize2fs -f /dev/mmcblk0p3
-    rpi-rw
+    if [ -f /usr/bin/rpi-rw ]; then
+      rpi-rw
+    fi
     rm /lib/systemd/system/resize2fs_once.service
     systemctl disable resize2fs_once.service
     rm /home/pi/resize2fs_once.sh
-    sed -i 's/^#\(.*\/home\/pi\/data\)/\1/' /etc/fstab
+    sed -i "s~^#\(.*$data_dir\)~\1~" /etc/fstab
     /bin/sync
     /sbin/shutdown -h now
 
@@ -107,13 +124,14 @@ EOF
 # Make the resize2fs_once script executable
 chmod +x /home/pi/resize2fs_once.sh
 # Ensure that the /data partition is unmounted after a reboot
-sed -i 's/^\([^#].*\/home\/pi\/data\)/#\1/' /etc/fstab
+sed -i "s~^[^#]*$data_dir~#&~" /etc/fstab
+
 echo
 echo
 echo ======================================================================
 echo
 echo So far, so good... in 20s your system will reboot
-echo and resize the /home/pi/data filesystem to fill the resized partition.
+echo and resize the $data_dir filesystem to fill the resized partition.
 echo **THIS OPERATION WILL TAKE UP TO 20 MINUTES**
 echo When completed the Pi will poweroff and close down.
 echo PLEASE DO NOT UNPLUG THE POWER FOR AT LEAST 30min
