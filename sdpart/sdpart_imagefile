@@ -38,7 +38,9 @@ fi
 echo "data_dir: $data_dir"
 
 ###################################################################
-rpi-rw
+if [ -f /usr/bin/rpi-rw ]; then
+  rpi-rw
+fi
 echo
 PART_END="$(($(blockdev --getsz /dev/mmcblk0)))"
 DATA_START="$(parted /dev/mmcblk0 -ms unit s p | grep "^3" | cut -f2 -d: | sed 's/[^0-9]*//g')"
