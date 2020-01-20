@@ -3,12 +3,23 @@
 # ----------------------------------------------------------------------------------
 # SDS011 Nova PM Sensor to Emoncms bridge
 # ----------------------------------------------------------------------------------
-
-emoncms_host = "http://localhost"
-emoncms_apikey = "APIKEY"
 emoncms_nodename = "SDS011"
 
-import serial, time, struct, urllib2, time
+import serial, time, struct, time
+import paho.mqtt.client as mqtt
+
+# import urllib2 (enable for http post)
+# emoncms_host = "http://localhost"
+# emoncms_apikey = "APIKEY"
+
+mqtt_user = "emonpi"
+mqtt_passwd = "emonpimqtt2016"
+mqtt_host = "localhost"
+mqtt_port = 1883
+
+mqttc = mqtt.Client()
+mqttc.username_pw_set(mqtt_user, mqtt_passwd)
+mqttc.connect(mqtt_host, mqtt_port, 60)
 
 ser = serial.Serial("/dev/ttyUSB0", baudrate=9600, stopbits=1, parity="N", timeout=2)
 
@@ -34,6 +45,7 @@ while True:
         
         pm_25 = readings[0]/10.0
         pm_10 = readings[1]/10.0
+        # print "PM 2.5:",pm_25,"μg/m^3  PM 10:",pm_10,"μg/m^3"
         
         pm_25_sum += pm_25
         pm_10_sum += pm_10
@@ -46,6 +58,12 @@ while True:
             pm_25 = round(pm_25_sum/count,3)
             pm_10 = round(pm_10_sum/count,3)
             print "PM 2.5:",pm_25,"μg/m^3  PM 10:",pm_10,"μg/m^3"
-            contents = urllib2.urlopen(emoncms_host+'/input/post?node='+emoncms_nodename+'&fulljson={"pm_25":'+str(pm_25)+',"pm_10":'+str(pm_10)+'}&apikey='+emoncms_apikey).read()
+            # contents = urllib2.urlopen(emoncms_host+'/input/post?node='+emoncms_nodename+'&fulljson={"pm_25":'+str(pm_25)+',"pm_10":'+str(pm_10)+'}&apikey='+emoncms_apikey).read()
+            mqttc.publish("emon/"+emoncms_nodename+"/pm_25",pm_25)
+            mqttc.publish("emon/"+emoncms_nodename+"/pm_10",pm_10)
+
+    mqttc.loop(0.0)
+    time.sleep(0.01)
+
 
 
