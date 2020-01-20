@@ -57,6 +57,9 @@ while True:
         if count>0:
             pm_25 = round(pm_25_sum/count,3)
             pm_10 = round(pm_10_sum/count,3)
+            pm_25_sum = 0
+            pm_10_sum = 0
+            count = 0
             print "PM 2.5:",pm_25,"μg/m^3  PM 10:",pm_10,"μg/m^3"
             # contents = urllib2.urlopen(emoncms_host+'/input/post?node='+emoncms_nodename+'&fulljson={"pm_25":'+str(pm_25)+',"pm_10":'+str(pm_10)+'}&apikey='+emoncms_apikey).read()
             mqttc.publish("emon/"+emoncms_nodename+"/pm_25",pm_25)
