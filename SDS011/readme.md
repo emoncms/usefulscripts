@@ -3,7 +3,7 @@
 Edit SDS011.py, set emoncms hostname and apikey to match your system.
 
     emoncms_host = "http://localhost"
-    emoncms_apikey = "a351e81bed836fb7bd99d9767b136be5"
+    emoncms_apikey = "APIKEY"
     emoncms_nodename = "SDS011"
     
 Install the SDS011 service:
