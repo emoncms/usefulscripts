@@ -5,8 +5,8 @@
 # ----------------------------------------------------------------------------------
 
 emoncms_host = "http://localhost"
-emoncms_apikey = "a351e81bed836fb7bd99d9767b136be5"
-emoncms_nodename = "pmsensor"
+emoncms_apikey = "APIKEY"
+emoncms_nodename = "SDS011"
 
 import serial, time, struct, urllib2, time
 
