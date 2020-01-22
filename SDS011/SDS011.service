@@ -1,0 +1,52 @@
+# Systemd unit file for SDS011 script
+
+# INSTALL:
+
+# sudo ln -s /opt/emoncms/modules/usefulscripts/SDS011/SDS011.service /lib/systemd/system
+
+# RUN AT STARTUP
+# sudo systemctl daemon-reload
+# sudo systemctl enable SDS011.service
+
+# START / STOP With:
+# sudo systemctl start SDS011
+# sudo systemctl stop SDS011    
+
+# VIEW STATUS / LOG
+# If Using Syslog:
+# sudo systemctl status SDS011 -n50
+# where -nX is the number of log lines to view 
+# sudo journalctl -f -u SDS011
+# Otherwise:
+# Specify
+# StandardOutput=file:/var/log/SDS011.log
+# tail -f /var/log/SDS011.log
+
+[Unit]
+Description=SDS011 script
+Wants=mysql.service redis.service
+After=mysql.service redis.service
+Documentation=https://github.com/emoncms/usefulscripts
+
+# Uncomment this line to use a dedicated log file for StdOut and StdErr.
+# NOTE: only works in systemd v236+
+#       Debain "stretch" includes v232, "buster" includes v239
+StandardOutput=file:/var/log/emoncms/SDS011.log
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python /opt/emoncms/modules/usefulscripts/SDS011/SDS011.py
+
+# Restart script if stopped on a failure. Will not restart if not configured correctly
+Restart=on-failure
+# Wait 60s before restart
+RestartSec=60
+
+# Tag things in the log
+# If you want to use the journal instead of the file above, uncomment SyslogIdentifier below
+# View with: sudo journalctl -f -u SDS011 -o cat
+SyslogIdentifier=SDS011
+
+[Install]
+WantedBy=multi-user.target
+
