@@ -1,5 +1,7 @@
 # SDS011 Nova PM Sensor to Emoncms bridge
 
+e.g https://www.amazon.co.uk/gp/product/B07911ZY9W
+
 Copy the enviroment file:
 
    cp default.env env
@@ -8,7 +10,7 @@ Edit your enviroment file to set your mqtt / emoncms http settings:
 
    nano env
 
-Export enviroment file:
+Export enviroment variables:
 
    export $(xargs <env)
 
@@ -37,4 +39,9 @@ Check service status:
 
    docker build -t dust .
    docker run --privileged --env-file=env dust
+   
+Run in the background and always restart
+
+   sudo docker run -d --privileged --restart=always --env-file=env dust
+
 
