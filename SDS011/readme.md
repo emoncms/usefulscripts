@@ -2,25 +2,44 @@
 
 e.g https://www.amazon.co.uk/gp/product/B07911ZY9W
 
+
+## Run using docker (Recomended)
+
+Tested on `emonSD-17Oct29`, Ubuntu 18.04 and Synology DSM6
+
+   ```
+   docker build -t dust .
+   docker run --privileged --env-file=env dust
+   ```
+   
+Run in the background on boot and always restart
+
+   `docker run -d --privileged --restart=always --env-file=env dust`
+   
+   
+****
+
+## Run locally 
+
 Copy the enviroment file:
 
-   cp default.env env
+   `cp default.env env`
 
 Edit your enviroment file to set your mqtt / emoncms http settings:
 
-   nano env
+   `nano env`
 
 Export enviroment variables:
 
-   export $(xargs <env)
+   `export $(xargs <env)`
 
 Install python reqs:
 
-   pip install pyserial paho-mqtt
+   `pip install pyserial paho-mqtt`
 
 Test the script:
 
-   ./SDS0111
+   `./SDS0111`
     
 Install the SDS011 service:
 
@@ -35,13 +54,6 @@ Check service status:
 
 
 
-## Run using docker 
 
-   docker build -t dust .
-   docker run --privileged --env-file=env dust
-   
-Run in the background and always restart
-
-   sudo docker run -d --privileged --restart=always --env-file=env dust
 
 
