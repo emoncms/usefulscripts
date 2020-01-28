@@ -5,7 +5,7 @@ e.g https://www.amazon.co.uk/gp/product/B07911ZY9W
 
 ## Run using docker (Recomended)
 
-Tested on `emonSD-17Oct29`, Ubuntu 18.04 and Synology DSM6
+Tested on `emonSD-17Oct19`, Ubuntu 18.04 and Synology DSM6
 
    ```
    docker build -t dust .
