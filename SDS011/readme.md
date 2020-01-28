@@ -7,6 +7,16 @@ e.g https://www.amazon.co.uk/gp/product/B07911ZY9W
 
 Tested on `emonSD-17Oct19`, Ubuntu 18.04 and Synology DSM6
 
+Copy the enviroment file:
+
+   `cp default.env env`
+
+Edit your enviroment file to set your mqtt / emoncms http settings:
+
+   `nano env`
+   
+Build and run the docker container
+
    ```
    docker build -t dust .
    docker run --privileged --env-file=env dust
