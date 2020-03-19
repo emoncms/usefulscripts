@@ -7,6 +7,8 @@ function register_emoncms_feed($mysqli,$redis,$feed)
     if (!$result->num_rows) 
     {
         echo "Create feed ".$feed->id."\n";
+        
+        if ($feed->public=="") $feed->public = "0";
                
         $mysqli->query("INSERT INTO feeds (id,userid,name,tag,datatype,public,size,engine) VALUES ('".$feed->id."','".$feed->userid."','".$feed->name."','".$feed->tag."','".$feed->datatype."','".$feed->public."','".$feed->size."','".$feed->engine."')");
 
