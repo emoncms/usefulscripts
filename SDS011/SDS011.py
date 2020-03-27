@@ -3,25 +3,42 @@
 # ----------------------------------------------------------------------------------
 # SDS011 Nova PM Sensor to Emoncms bridge
 # ----------------------------------------------------------------------------------
-emoncms_nodename = "SDS011"
 
-import serial, time, struct, time
+import serial, time, struct, time, urllib2, os
 import paho.mqtt.client as mqtt
 
-# import urllib2 (enable for http post)
-# emoncms_host = "http://localhost"
-# emoncms_apikey = "APIKEY"
+emoncms_nodename = os.environ['EMONCMS_NODENAME']
+print 'emoncms nodename: ' + emoncms_nodename
 
-mqtt_user = "emonpi"
-mqtt_passwd = "emonpimqtt2016"
-mqtt_host = "localhost"
-mqtt_port = 1883
+emoncms_host = os.environ['EMONCMS_HOST']
+print 'emoncms host: ' + emoncms_host
+emoncms_apikey = os.environ['EMONCMS_APIKEY']
+print 'emoncms apikey: ' + emoncms_apikey
+http_enable = os.environ['HTTP_ENABLE']
+print 'http enable: ' + http_enable
 
-mqttc = mqtt.Client()
-mqttc.username_pw_set(mqtt_user, mqtt_passwd)
-mqttc.connect(mqtt_host, mqtt_port, 60)
+mqtt_user = os.environ['MQTT_USER']
+print 'mqtt user: ' + mqtt_user
+mqtt_passwd = os.environ['MQTT_PASSWD']
+print 'mqtt pass: ' + mqtt_passwd
+mqtt_host = os.environ['MQTT_HOST']
+print 'mqtt host: ' + mqtt_host
+mqtt_port = os.environ['MQTT_PORT']
+print 'mqtt port: ' + mqtt_port
+mqtt_enable = os.environ['MQTT_ENABLE']
+print 'mqtt enable: ' + mqtt_enable
 
-ser = serial.Serial("/dev/ttyUSB0", baudrate=9600, stopbits=1, parity="N", timeout=2)
+serial_port = os.environ['SERIAL_PORT']
+print 'serial port: ' + serial_port
+
+if mqtt_enable=='True':
+    print 'Starting MQTT...'
+    mqttc = mqtt.Client()
+    mqttc.username_pw_set(mqtt_user, mqtt_passwd)
+    mqttc.connect(mqtt_host, mqtt_port, 60)
+
+print 'connecting to ' + serial_port
+ser = serial.Serial(serial_port, baudrate=9600, stopbits=1, parity="N", timeout=2)
 
 ser.flushInput()
 
@@ -34,6 +51,7 @@ count = 0
 
 lasttime = 0
 
+print 'starting loop..'
 while True:
     lastbyte = byte
     byte = ser.read(size=1)
@@ -61,11 +79,17 @@ while True:
             pm_10_sum = 0
             count = 0
             print "PM 2.5:",pm_25,"μg/m^3  PM 10:",pm_10,"μg/m^3"
-            # contents = urllib2.urlopen(emoncms_host+'/input/post?node='+emoncms_nodename+'&fulljson={"pm_25":'+str(pm_25)+',"pm_10":'+str(pm_10)+'}&apikey='+emoncms_apikey).read()
-            mqttc.publish("emon/"+emoncms_nodename+"/pm_25",pm_25)
-            mqttc.publish("emon/"+emoncms_nodename+"/pm_10",pm_10)
+            if http_enable=='True':
+                print 'http post..'
+                contents = urllib2.urlopen(emoncms_host+'/input/post?node='+emoncms_nodename+'&fulljson={"pm_25":'+str(pm_25)+',"pm_10":'+str(pm_10)+'}&apikey='+emoncms_apikey).read()
+            if mqtt_enable=='True':
+                print 'mqtt post..'
+                mqttc.publish("emon/"+emoncms_nodename+"/pm_25",pm_25)
+                mqttc.publish("emon/"+emoncms_nodename+"/pm_10",pm_10)
 
-    mqttc.loop(0.0)
+    if mqtt_enable=='True':
+        mqttc.loop(0.0)
+
     time.sleep(0.01)
 
 
