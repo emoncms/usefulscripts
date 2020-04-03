@@ -1,7 +1,7 @@
 <?php
 /*
 
-  PHPTIMESTORE to PHPFINA conversion script
+  PHPTIMESTORE/TIMESTORE to PHPFINA conversion script
 
   How it works:
   PHPTIMESTORE stores its bottom layer in the same format as PHPFina.
@@ -18,7 +18,7 @@ if (posix_geteuid()!=0) {
 }
 
 print "---------------------------------------------------\n";
-print "PHPTIMESTORE to PHPFINA conversion script\n";
+print "PHPTIMESTORE/TIMESTORE to PHPFINA conversion script\n";
 print "---------------------------------------------------\n";
 
 define('EMONCMS_EXEC', 1);
@@ -56,6 +56,10 @@ if ( $mysqli->connect_error ) {
 
 if ($settings['redis']['enabled']) {
     $redis = new Redis();
+    // older emoncms versions do not have redis server name and port defined, use defaults
+    if (empty($settings['redis']['host'])) $settings['redis']['host'] = "localhost";
+    if (empty($settings['redis']['port'])) $settings['redis']['port'] = "6379";
+        
     $connected = $redis->connect($settings['redis']['host'], $settings['redis']['port']);
     if (!$connected) { echo "Can't connect to redis at ".$settings['redis']['host'].":".$settings['redis']['port']." , it may be that redis-server is not installed or started see readme for redis installation"; die; }
     if (!empty($settings['redis']['prefix'])) $redis->setOption(Redis::OPT_PREFIX, $settings['redis']['prefix']);
@@ -73,13 +77,13 @@ if ($settings['redis']['enabled']) {
 
 // Either use default phpfina data directories
 // or use user specified directory from emoncms/settings.php
-$sourcedir = "/var/lib/phpfina/";
-if (isset($settings["feed"]["phpfina"])) $sourcedir = $settings["feed"]["phpfina"]["datadir"];
-$targetdir = "/var/lib/timestore/";
-if (isset($settings["feed"]["timestore"])) $targetdir = $settings["feed"]["timestore"]["datadir"];
+$sourcedir = "/var/lib/timestore/";
+if (isset($settings["feed"]["timestore"]["datadir"])) $sourcedir = $settings["feed"]["timestore"]["datadir"];
+$targetdir = "/var/lib/phpfina/";
+if (isset($settings["feed"]["phpfina"])) $targetedir = $settings["feed"]["phpfina"]["datadir"];
 
-// Find all PHPTimestore feeds
-$result = $mysqli->query("SELECT * FROM feeds WHERE `engine`=4");
+// Find all timestore and PHPTimestore feeds
+$result = $mysqli->query("SELECT * FROM feeds WHERE `engine`=1 OR `engine`=4");
 
 // Quick check at this point so that conversion can be aborted
 if ($result->num_rows>0) {
@@ -168,8 +172,8 @@ while($row = $result->fetch_array())
         $mysqli->query("UPDATE feeds SET `engine`=5 WHERE `id`='$outid'");
         $redis->hSet("feed:".$outid,"engine",5);
         
-        exec("chown www-data:www-data ".$targetdir.$outid.".meta");
-        exec("chown www-data:www-data ".$targetdir.$outid.".dat");
+        exec("chown --reference=".$targetdir." ".$targetdir.$outid.".meta");
+        exec("chown --reference=".$targetdir." ".$targetdir.$outid.".dat");
         
         // Register feeds to delete
         $phptimestorefeeds[] = $id;
