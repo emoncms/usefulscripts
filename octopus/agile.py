@@ -1,11 +1,9 @@
-import sys,requests, json
+import sys, os, requests, json
 from datetime import datetime
-
 from configobj import ConfigObj
-settings = ConfigObj("agile.conf", file_error=True)
 
-# Agile request parameters
-params = {'page':1,'order_by':'period','page_size':25000}
+script_path = os.path.dirname(os.path.realpath(__file__))
+settings = ConfigObj(script_path+"/agile.conf", file_error=True)
 
 # Step 1: Create feed via API call or use input interface in emoncms to create manually
 result = requests.get(settings['emoncms']['server']+"/feed/getid.json",params={'tag':'agile','name':'consumption','apikey':settings['emoncms']['apikey']})
@@ -16,13 +14,16 @@ if  not result.text:
     result = json.loads(result.text)
     if result['success']:
         feedid = int(result['feedid'])
-        print("Eemoncms feed created:\t"+str(feedid))
+        print("Emoncms feed created:\t"+str(feedid))
     else:
         print("Error creating feed")
         sys.exit(0)
 else:
     feedid = int(result.text)
     print("Using emoncms feed:\t"+str(feedid))
+
+# Agile request parameters
+params = {'page':1,'order_by':'period','page_size':25000}
 
 # Step 2: Fetch feed meta data to find last data point time and value
 result = requests.get(settings['emoncms']['server']+"/feed/getmeta.json",params={'id':feedid,'apikey':settings['emoncms']['apikey']})
