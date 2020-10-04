@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys, os, requests, json
 from datetime import datetime
 from configobj import ConfigObj
