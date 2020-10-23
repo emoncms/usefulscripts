@@ -6,6 +6,7 @@ This script can be ran daily from cron to pull in the latest data automatically.
 
 1\. Create config file from default:
 
+    cd /opt/emoncms/modules/usefulscripts/octopus/
     cp default.agile.conf agile.conf
     
 2\. Enter configuration including emoncms apikey and authentication and meter details from Octopus
