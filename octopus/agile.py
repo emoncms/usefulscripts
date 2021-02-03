@@ -30,10 +30,10 @@ result = requests.get(settings['emoncms']['server']+"/feed/getmeta.json",params=
 meta = json.loads(result.text)
 print("Feed meta data:\t\t"+result.text)
 
-if meta['npoints']>0:
-    end_time = meta['start_time'] + (meta['interval'] * meta['npoints'])
-    params['period_from'] = datetime.fromtimestamp(end_time).astimezone().isoformat()
-    print("Request from:\t\t"+params['period_from'])
+#if meta['npoints']>0:
+#    end_time = meta['start_time'] + (meta['interval'] * meta['npoints'])
+#    params['period_from'] = datetime.fromtimestamp(end_time).astimezone().isoformat()
+#    print("Request from:\t\t"+params['period_from'])
 
 # Step 3: Request history from Octopus
 url = "https://api.octopus.energy/v1/electricity-meter-points/%s/meters/%s/consumption/" % (settings['octopus']['mpan'],settings['octopus']['serial_number'])
@@ -57,4 +57,4 @@ for dp in data['results']:
 # Step 5: Send data to emoncms
 if len(data_out):
     print("Posting data to emoncms")
-    result = requests.post(settings['emoncms']['server']+"/feed/insert.json",params={'id':feedid,'apikey':settings['emoncms']['apikey']},data={'data':json.dumps(data_out)})
+    result = requests.post(settings['emoncms']['server']+"/feed/insert.json",params={'id':feedid,'apikey':settings['emoncms']['apikey'],'skipbuffer':1},data={'data':json.dumps(data_out)})
