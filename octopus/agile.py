@@ -6,10 +6,10 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 settings = ConfigObj(script_path+"/agile.conf", file_error=True)
 
 # Step 1: Create feed via API call or use input interface in emoncms to create manually
-result = requests.get(settings['emoncms']['server']+"/feed/getid.json",params={'tag':'agile','name':'consumption','apikey':settings['emoncms']['apikey']})
+result = requests.get(settings['emoncms']['server']+"/feed/getid.json",params={'tag':settings['emoncms']['tag'],'name':settings['emoncms']['name'],'apikey':settings['emoncms']['apikey']})
 if  not result.text:
     # Create feed
-    params = {'tag':'agile','name':'consumption','datatype':1,'engine':5,'options':'{"interval":1800}','unit':'kWh','apikey':settings['emoncms']['apikey']}
+    params = {'tag':settings['emoncms']['tag'],'name':settings['emoncms']['name'],'datatype':1,'engine':5,'options':'{"interval":1800}','unit':'kWh','apikey':settings['emoncms']['apikey']}
     result = requests.get(settings['emoncms']['server']+"/feed/create.json",params)
     result = json.loads(result.text)
     if result['success']:
