@@ -1,7 +1,7 @@
 {
     "name"         : "usefulscripts",
-    "version"      : "2.3.6",
+    "version"      : "2.3.7",
     "location"     : "/opt/emoncms/modules",
-    "branches_available": ["stable","master","menu_v3"],
+    "branches_available": ["stable","master"],
     "requires": []
 }
