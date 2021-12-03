@@ -16,6 +16,8 @@
       // Create feed
       echo "create feed ".$feed->id."\n";
       //$result = $mysqli->query("INSERT INTO feeds (id,userid,name,tag,datatype,public,engine) VALUES ('".$feed->id."','$userid','".$feed->name."','".$feed->tag."','".$feed->datatype."','false','0')");
+      
+      if (!isset($feed->datatype)) $feed->datatype = 1;
 
       if ($feed->datatype==1 || $feed->datatype==2)
       {

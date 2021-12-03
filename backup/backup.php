@@ -112,7 +112,7 @@
             import_mysql($feed,$remote_server,$remote_apikey,$mysqli);
         }
         
-        if ($feed->engine==1 && $feed->datatype==1) {
+        if ($feed->engine==1) {
             import_phptimestore($feed->id,$remote_server,$remote_apikey,$engines['phptimestore']['datadir']);
         }
 
@@ -128,7 +128,7 @@
             import_phpfiwa($feed->id,$remote_server,$remote_apikey,$engines['phpfiwa']['datadir']);
         }
 
-        if ($feed->engine==4 && $feed->datatype==1) {
+        if ($feed->engine==4) {
             import_phptimestore($feed->id,$remote_server,$remote_apikey,$engines['phptimestore']['datadir']);
         }
     }

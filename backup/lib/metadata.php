@@ -10,14 +10,14 @@ function register_emoncms_feed($mysqli,$redis,$feed)
         
         if ($feed->public=="") $feed->public = "0";
                
-        $mysqli->query("INSERT INTO feeds (id,userid,name,tag,datatype,public,size,engine) VALUES ('".$feed->id."','".$feed->userid."','".$feed->name."','".$feed->tag."','".$feed->datatype."','".$feed->public."','".$feed->size."','".$feed->engine."')");
+        $mysqli->query("INSERT INTO feeds (id,userid,name,tag,datatype,public,size,engine) VALUES ('".$feed->id."','".$feed->userid."','".$feed->name."','".$feed->tag."','1','".$feed->public."','".$feed->size."','".$feed->engine."')");
 
         if ($redis) {
             $redis->hMSet("feed:$feed->id",array(
                 'id'=>$feed->id,
                 'userid'=>$feed->userid,
                 'name'=>$feed->name,
-                'datatype'=>$feed->datatype,
+                'datatype'=>1,
                 'tag'=>$feed->tag,
                 'public'=>$feed->public,
                 'size'=>$feed->size,
@@ -42,7 +42,7 @@ function reload_emoncms_feeds($mysqli,$redis,$userid)
         'id'=>$row->id,
         'userid'=>$row->userid,
         'name'=>$row->name,
-        'datatype'=>$row->datatype,
+        'datatype'=>1,
         'tag'=>$row->tag,
         'public'=>$row->public,
         'size'=>$row->size,
