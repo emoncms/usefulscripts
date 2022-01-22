@@ -50,7 +50,9 @@ if os.path.exists(username+"/feeds.json"):
         feeds = json.load(json_file)
         for f in feeds:
             if int(f['engine'])==2:
+                print("Converting phptimeseries feed "+str(f['id']))
                 phptimeseries_convert(username+"/phptimeseries/",username+"/csv/",f['id'],f['tag'],f['name'])
             if int(f['engine'])==5:
-                # phpfina_convert(username+"/phpfina/",username+"/csv/",f['id'],f['tag'],f['name'])        
+                print("Converting phpfina feed "+str(f['id']))
+                phpfina_convert(username+"/phpfina/",username+"/csv/",f['id'],f['tag'],f['name'])        
                 pass
