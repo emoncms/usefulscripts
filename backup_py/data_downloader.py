@@ -7,16 +7,17 @@ password = ""
 def phpfina_get_meta(datadir,feedid):
     if os.path.isfile(datadir+str(feedid)+".meta"):
         fh = open(datadir+str(feedid)+".meta","rb")
-        tmp = struct.unpack("IIII",fh.read(16))
-        fh.close()
-        meta = {'start_time': tmp[2], 'interval': tmp[3], 'npoints':0}
-        
-        if os.path.isfile(datadir+str(feedid)+".dat"):
-            bytesize = os.stat(datadir+str(feedid)+".dat").st_size
-            meta['npoints'] = int(bytesize/4.0)
-        return meta
-    else:
-        return False
+        bytes = fh.read(16)
+        if len(bytes)==16:
+            tmp = struct.unpack("IIII",bytes)
+            fh.close()
+            meta = {'start_time': tmp[2], 'interval': tmp[3], 'npoints':0}
+            
+            if os.path.isfile(datadir+str(feedid)+".dat"):
+                bytesize = os.stat(datadir+str(feedid)+".dat").st_size
+                meta['npoints'] = int(bytesize/4.0)
+            return meta
+    return False
 
 def phpfina_create_meta(datadir,feedid,meta):
     fh = open(datadir+str(feedid)+".meta","wb")
@@ -40,6 +41,9 @@ def phpfina_download(datadir,feedid,host,apikey):
     # 1. Get remote meta
     result = requests.get(host+"/feed/getmeta.json",params={'id':feedid,'apikey':apikey})
     meta = json.loads(result.text)
+    
+    if meta['npoints']==0: 
+        return False
 
     # 2. Get local meta
     download_start = 0
