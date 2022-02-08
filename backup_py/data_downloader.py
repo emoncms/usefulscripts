@@ -1,8 +1,8 @@
 import requests, os, sys, json, struct
 
 host = "https://emoncms.org"
-username = ""
-password = ""
+username = "flatllanberis"
+password = "flatllanberis"
 
 def phpfina_get_meta(datadir,feedid):
     if os.path.isfile(datadir+str(feedid)+".meta"):
@@ -32,9 +32,12 @@ def download_file(filename,url,mode):
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
         with open(filename, mode) as f:
-            for chunk in r.iter_content(chunk_size=8192): 
-                f.write(chunk)
-                size += len(chunk)
+            try:
+                for chunk in r.iter_content(chunk_size=8192): 
+                    f.write(chunk)
+                    size += len(chunk)
+            except Exception as e:
+                print (e)
     return size
 
 def phpfina_download(datadir,feedid,host,apikey):
