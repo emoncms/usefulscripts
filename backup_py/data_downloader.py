@@ -1,8 +1,8 @@
 import requests, os, sys, json, struct
 
 host = "https://emoncms.org"
-username = "flatllanberis"
-password = "flatllanberis"
+username = ""
+password = ""
 
 def phpfina_get_meta(datadir,feedid):
     if os.path.isfile(datadir+str(feedid)+".meta"):
