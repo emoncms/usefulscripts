@@ -9,18 +9,19 @@ sys.path.append('/opt/openenergymonitor/emonhub/src')
 from interfacers import *
 mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,baud_rate)
 
-old_address = int(input("Please enter address to check (default: 1): ") or "1")
+while True:
+    address = int(input("Please enter address to check (default: 1): ") or "1")
 
-print ("Sending command to check meter at address "+str(old_address))
-mbus.mbus_short_frame(old_address, 0x40)
-time.sleep(1.0)
-reply = False
-while mbus.ser.in_waiting:
-    val = ord(mbus.ser.read(1))
-    if val==229: 
-        print("ACK")
-        reply = True
+    print ("Sending command to check meter at address "+str(address))
+    mbus.mbus_short_frame(address, 0x40)
+    time.sleep(1.0)
+    reply = False
+    while mbus.ser.in_waiting:
+        val = ord(mbus.ser.read(1))
+        if val==229: 
+            print("ACK")
+            reply = True
 
-if not reply:
-    print("no reply received")
-    sys.exit(0)
+    if not reply:
+        print("no reply received")
+        sys.exit(0)
