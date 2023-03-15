@@ -10,7 +10,7 @@ from interfacers import *
 mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,baud_rate)
 
 while True:
-    address = int(input("Please enter address to check (default: 1): ") or "1")
+    address = int(input("Please enter address to check (default: 0): ") or "0")
 
     print ("Sending command to check meter at address "+str(address))
     mbus.mbus_short_frame(address, 0x40)

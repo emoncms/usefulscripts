@@ -9,6 +9,6 @@ sys.path.append('/opt/openenergymonitor/emonhub/src')
 from interfacers import *
 mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,baud_rate)
 
-address = int(input("Please enter address to check (default: 1): ") or "1")
+address = int(input("Please enter address to check (default: 0): ") or "0")
 
 mbus.mbus_application_reset(address)
