@@ -15,8 +15,8 @@ mbus.debug_data_frame = True
 
 mbus.set_page(address, 1)
 
-self.mbus_short_frame(address, 0x5b)
+mbus.mbus_short_frame(address, 0x5b)
 
-result = self.read_data_frame([])
+result = mbus.read_data_frame([])
 
 print(result)
