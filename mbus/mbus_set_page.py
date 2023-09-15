@@ -6,12 +6,7 @@ sys.path.append('/opt/openenergymonitor/emonhub/src')
 from interfacers import *
 mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,baud_rate)
 
-mbus.debug_data_frame = True
+page = int(input("Please enter page (default: 1): ") or "1")
 
-# mbus.set_page(address, 1)
+mbus.set_page(address, page)
 
-mbus.mbus_short_frame(address, 0x7b)
-
-result = mbus.read_data_frame([])
-
-print(result)
