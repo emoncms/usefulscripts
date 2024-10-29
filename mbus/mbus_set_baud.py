@@ -9,7 +9,7 @@ print ("Trying to connect on "+str(serial_port)+" "+str(current_baud_rate))
 
 sys.path.append('/opt/openenergymonitor/emonhub/src')
 from interfacers import *
-mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,current_baud_rate)
+mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,False,False,current_baud_rate)
 
 
 
@@ -41,7 +41,7 @@ if not reply:
     print("no reply received")
     sys.exit(0)  
 
-mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,new_baud_rate)
+mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,False,False,new_baud_rate)
 
 print ("Sending command to check meter at address "+str(address))
 

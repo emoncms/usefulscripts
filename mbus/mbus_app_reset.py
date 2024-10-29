@@ -4,6 +4,6 @@ serial_port, baud_rate, address = conf.load()
 
 sys.path.append('/opt/openenergymonitor/emonhub/src')
 from interfacers import *
-mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,baud_rate)
+mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,False,False,baud_rate)
 
 mbus.mbus_application_reset(address)

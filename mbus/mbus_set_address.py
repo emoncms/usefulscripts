@@ -7,7 +7,7 @@ print ("Trying to connect on "+str(serial_port)+" "+str(baud_rate))
 
 sys.path.append('/opt/openenergymonitor/emonhub/src')
 from interfacers import *
-mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,baud_rate)
+mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,False,False,baud_rate)
 
 old_address = int(input("Please enter current address (default: 254): ") or "254")
 new_address = int(input("Please enter new address (default: 1): ") or "1")

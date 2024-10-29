@@ -4,7 +4,7 @@ serial_port, baud_rate, address = conf.load()
 
 sys.path.append('/opt/openenergymonitor/emonhub/src')
 from interfacers import *
-mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,baud_rate)
+mbus = EmonHubMBUSInterfacer.EmonHubMBUSInterfacer("MBUS",serial_port,False,False,baud_rate)
 
 page = int(input("Please enter page (default: 1): ") or "1")
 
