@@ -19,8 +19,6 @@ def phpfina_get_meta(datadir,feedid):
 
 def phpfina_convert(datadir,csvdir,feedid,tag,name):
     meta = phpfina_get_meta(datadir,feedid)
-    print(tag)
-    print(name)
     csv_path = csvdir+str(feedid)+"-"+str(tag)+"-"+str(name)+".csv"
     csv_path= csv_path.replace(":", "-") # this is needed on windows at least because ":" are not allowed in file names
     csv_fh = open(csv_path,"w")
