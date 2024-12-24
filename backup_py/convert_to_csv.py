@@ -19,7 +19,11 @@ def phpfina_get_meta(datadir,feedid):
 
 def phpfina_convert(datadir,csvdir,feedid,tag,name):
     meta = phpfina_get_meta(datadir,feedid)
-    csv_fh = open(csvdir+str(feedid)+"-"+str(tag)+"-"+str(name)+".csv","w")
+    print(tag)
+    print(name)
+    csv_path = csvdir+str(feedid)+"-"+str(tag)+"-"+str(name)+".csv"
+    csv_path= csv_path.replace(":", "-") # this is needed on windows at least because ":" are not allowed in file names
+    csv_fh = open(csv_path,"w")
     fh = open(datadir+str(feedid)+".dat","rb")
     for i in range(0,meta['npoints']):
         time = meta['start_time'] + i*meta['interval']
@@ -32,8 +36,9 @@ def phptimeseries_convert(datadir,csvdir,feedid,tag,name):
     if os.path.isfile(datadir+"feed_"+str(feedid)+".MYD"):
         bytesize = os.stat(datadir+"feed_"+str(feedid)+".MYD").st_size
         npoints = int(bytesize/9.0)
-        
-        csv_fh = open(csvdir+str(feedid)+"-"+str(tag)+"-"+str(name)+".csv","w")
+        csv_path = csvdir+str(feedid)+"-"+str(tag)+"-"+str(name)+".csv"
+        csv_path = csv_path.replace(":", "-") # this is needed on windows at least because ":" are not allowed in file names
+        csv_fh = open(csv_path,"w")
         fh = open(datadir+"feed_"+str(feedid)+".MYD","rb")
         
         for i in range(0,npoints):
