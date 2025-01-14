@@ -2,13 +2,18 @@ import requests
 from datetime import datetime
 import sys
 import json
+import os
+from configobj import ConfigObj
+
+script_path = os.path.dirname(os.path.realpath(__file__))
+settings = ConfigObj(script_path+"/agile.conf", file_error=True)
 
 # Emoncms account details
-host = "https://emoncms.org"
-apikey = "WRITE_APIKEY"
+host = settings['emoncms']['server']
+apikey = settings['emoncms']['apikey']
 
 # AGILE-18-02-21, AGILE-22-07-22, AGILE-22-08-31, AGILE-23-12-06, AGILE-VAR-22-10-19, AGILE-FLEX-22-11-25
-tariff_name = "AGILE-23-12-06"
+tariff_name = settings['octopus']['tariff_name']
 
 # Regions
 """
@@ -27,7 +32,7 @@ tariff_name = "AGILE-23-12-06"
 "N": "Southern_Scotland",
 "P": "Northern_Scotland"
 """
-gsp_id = "D"
+gsp_id = settings['octopus']['gsp_id']
 
 feed_name = f"{tariff_name}-{gsp_id}"
 
