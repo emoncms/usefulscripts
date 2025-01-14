@@ -1,5 +1,6 @@
 import requests
 from datetime import datetime
+import time
 import sys
 import json
 import os
@@ -48,6 +49,8 @@ if response.status_code == 200:
             feedid = feed['id']
             break
 
+end_time = 0
+
 # if feed not found, create a new feed
 # https://emoncms.org/feed/create.json?tag=Octopus&name=AGILE-23-12-06-D&engine=5&options={"interval":1800}
 if feedid is None:
@@ -62,26 +65,90 @@ if feedid is None:
 
     if response.status_code == 200:
         feedid = response.json()['feedid']
+else:
+    # If the feed exists get the last data point
+    url = f"{host}/feed/getmeta.json?id={feedid}&apikey={apikey}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        meta = response.json()
+        if meta['npoints'] > 0:
+            end_time = meta['start_time'] + (meta['interval'] * meta['npoints'])
 
-url = f"https://api.octopus.energy/v1/products/{tariff_name}/electricity-tariffs/E-1R-{tariff_name}-{gsp_id}/standard-unit-rates/"
-response = requests.get(url)
+# Calculate number of half hours since last data point
+now = time.time()
+diff = now - end_time
+half_hours = int(diff / 1800)
+page_size = half_hours
 
-if response.status_code == 200:
-    result = response.json()
+if page_size > 1500:
+    page_size = 1500
 
-    if result is not None and 'results' in result:
+if page_size < 100:
+    page_size = 100
 
-        data = []
-        for row in result['results']:
-            date = datetime.fromisoformat(row['valid_from'].replace('Z', '+00:00'))
-            data.append([int(date.timestamp()), row['value_exc_vat']])
+print (f"Number of half hours since last data point: {half_hours}, page size: {page_size}")
 
-        # sort by timestamp asc
-        data.sort(key=lambda x: x[0])
+data = []
 
-        # Send data to emoncms feed/post API
-        url = f"{host}/feed/post.json?id={feedid}&apikey={apikey}&data={data}"
-        response = requests.get(url)
+# start from page 1 and go through all pages
+page = 1
+while True:
 
-        if response.status_code == 200:
-            print("Data uploaded successfully")
+    complete = False
+
+    print (f"Fetching page {page}")
+    url = f"https://api.octopus.energy/v1/products/{tariff_name}/electricity-tariffs/E-1R-{tariff_name}-{gsp_id}/standard-unit-rates/?page={page}&page_size={page_size}"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        result = response.json()
+
+        if result is not None and 'results' in result:
+
+            print (f"Number of data points: {len(result['results'])}")
+            if len(result['results']) == 0:
+                complete = True
+                break
+
+            for row in result['results']:
+                date = datetime.fromisoformat(row['valid_from'].replace('Z', '+00:00'))
+                timestamp = int(date.timestamp())
+
+                if timestamp < end_time:
+                    complete = True
+                    break
+
+                data.append([int(date.timestamp()), row['value_exc_vat']])
+        else:
+            complete = True
+            break
+    else:
+        complete = True
+        break
+
+    if complete:
+        break
+
+    page += 1
+                
+
+
+# print number of data points
+print(f"Number of data points: {len(data)}")
+
+# sys.exit(0)
+
+if len(data):
+    # sort by timestamp asc
+    data.sort(key=lambda x: x[0])
+
+    # Send data to emoncms feed/post API
+    url = f"{host}/feed/post.json?id={feedid}&apikey={apikey}"
+    response = requests.post(url, data={'data': json.dumps(data)})
+
+    if response.status_code == 200:
+        print("Data uploaded successfully")
+    else:
+        print("Error uploading data")
+        print(response.text)
+
