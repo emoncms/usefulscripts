@@ -92,6 +92,7 @@ data = []
 
 # start from page 1 and go through all pages
 page = 1
+max_page_load = 30
 while True:
 
     complete = False
@@ -130,6 +131,8 @@ while True:
         break
 
     page += 1
+    if page > max_page_load:
+        break
                 
 
 
