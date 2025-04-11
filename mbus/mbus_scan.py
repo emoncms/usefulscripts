@@ -19,5 +19,4 @@ for address in range(0, 254):
 
     if not reply:
         print("no reply received from address "+str(address))
-        sys.exit(0)
 
